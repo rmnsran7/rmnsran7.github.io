@@ -1,0 +1,47 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "pch_id": 8,
+        "pch_label": "Concordia Place ",
+        "hospital_id": 2,
+        "hospital_name": "Concordia Hospital",
+        "distance_km": 0.15615894036698102,
+        "time_minutes": 1.3529809692644998,
+        "rank_by_distance": 1,
+        "rank_by_time": 1
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.06330825799995,
+            49.912485229000026
+          ],
+          [
+            -97.06344889999997,
+            49.912533600000074
+          ],
+          [
+            -97.06406879999997,
+            49.91243990000004
+          ],
+          [
+            -97.06411309999999,
+            49.91250290000005
+          ],
+          [
+            -97.06417679999998,
+            49.91257880000006
+          ],
+          [
+            -97.06491344399996,
+            49.91299916300005
+          ]
+        ]
+      }
+    }
+  ]
+}
