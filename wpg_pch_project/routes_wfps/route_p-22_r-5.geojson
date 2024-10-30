@@ -1,0 +1,40 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "coordinates": [
+          [
+            -97.122788,
+            49.945373
+          ],
+          [
+            -97.14763,
+            49.953494
+          ],
+          [
+            -97.160221,
+            49.93917
+          ],
+          [
+            -97.175648,
+            49.944145
+          ],
+          [
+            -97.179107,
+            49.939664
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "pch_id": 22,
+        "wfps_id": 18,
+        "duration": 652.552,
+        "distance": 5622.075,
+        "rank": 5
+      }
+    }
+  ]
+}
