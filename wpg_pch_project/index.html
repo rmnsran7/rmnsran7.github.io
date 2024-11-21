@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Interactive Dashboard Map</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
+    <style>
+      :root {
+        --primary-grey: #2c3e50;
+        --secondary-grey: #34495e;
+        --light-grey: #ecf0f1;
+        --border-grey: #bdc3c7;
+        --highlight-blue: #3498db;
+        --text-dark: #2c3e50;
+        --text-light: #ffffff;
+        --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: 1fr 3fr 1fr;
+        grid-template-rows: auto 1fr;
+        height: 100vh;
+        background-color: var(--light-grey);
+        color: var(--text-dark);
+      }
+
+      .header {
+        grid-column: 1 / span 3;
+        background-color: var(--primary-grey);
+        color: var(--text-light);
+        padding: 20px 30px;
+        font-size: 24px;
+        font-weight: 500;
+        box-shadow: var(--shadow);
+      }
+
+      .column-left,
+      .column-right {
+        padding: 10px;
+        background-color: var(--light-grey);
+        height: calc(100vh - 70px);
+        overflow: auto;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      .filter-container {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .column-left {
+        scroll-behavior: smooth;
+      }
+
+      .filter-container:last-child {
+        margin-bottom: 30px;
+      }
+
+      .column-map {
+        display: grid;
+        grid-template-rows: 1fr;
+        padding: 10px;
+        gap: 20px;
+        background-color: var(--light-grey);
+        overflow: auto;
+        -ms-overflow-style: none;
+      }
+
+      .filter-container {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow);
+      }
+
+      .sub-head {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--primary-grey);
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border-grey);
+      }
+
+      .filter-label {
+        font-weight: 500;
+        margin: 10px 0;
+        color: var(--secondary-grey);
+        font-size: 14px;
+      }
+
+      select,
+      input[type="range"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid var(--border-grey);
+        border-radius: 4px;
+        margin-bottom: 10px;
+        background-color: white;
+      }
+
+      select {
+        cursor: pointer;
+      }
+
+      .radio-container {
+        margin: 8px 0;
+        display: flex;
+        align-items: center;
+      }
+
+      .radio-container input[type="radio"] {
+        margin-right: 8px;
+      }
+
+      .count {
+        color: var(--highlight-blue);
+        font-size: 0.9em;
+        margin-left: 5px;
+      }
+
+      .stats-container {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 0;
+        padding: 10px;
+        background-color: var(--light-grey);
+        border-radius: 4px;
+      }
+
+      .stat-label {
+        font-size: 13px;
+        color: var(--secondary-grey);
+        font-weight: 500;
+      }
+
+      .map-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+
+      #map {
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
+
+      #zoomButton {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        padding: 8px;
+        cursor: pointer;
+        opacity: 0.8;
+        transition: opacity 0.3s;
+        background: white;
+        border-radius: 4px;
+        box-shadow: var(--shadow);
+        z-index: 1;
+      }
+
+      #zoomButton:hover {
+        opacity: 1;
+      }
+
+      #zoomButton img {
+        display: block;
+      }
+
+      #real-time-btn {
+        padding: 10px 20px;
+        background-color: var(--highlight-blue);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s;
+      }
+
+      #real-time-btn:hover {
+        background-color: #2980b9;
+      }
+
+      .row-30 {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
+
+      .stats-value {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--highlight-blue);
+        margin: 5px 0;
+      }
+
+      .stats-label {
+        font-size: 14px;
+        color: var(--secondary-grey);
+        margin-bottom: 15px;
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        height: 8px;
+        background: var(--light-grey);
+        border-radius: 4px;
+        margin: 15px 0;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        background: var(--highlight-blue);
+        border-radius: 50%;
+        cursor: pointer;
+      }
+
+      #bedCountDisplay {
+        font-weight: 600;
+        color: var(--highlight-blue);
+        margin-left: 5px;
+      }
+
+      .total-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-grey);
+      }
+
+      .total-stat b {
+        color: var(--highlight-blue);
+        font-size: 18px;
+      }
+
+      .filter-group {
+        margin-bottom: 20px;
+      }
+
+      .controls-container {
+        padding: 15px;
+        height: 100%;
+      }
+
+      .route-info {
+        margin-top: 20px;
+        padding: 15px;
+        background: var(--light-grey);
+        border-radius: 4px;
+      }
+
+      .route-info h3 {
+        margin: 0 0 10px 0;
+        color: var(--secondary-grey);
+        font-size: 16px;
+      }
+
+      .route-info p {
+        margin: 0;
+        color: var(--text-dark);
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .analysis-content {
+        padding: 15px;
+        background: var(--light-grey);
+        border-radius: 4px;
+        margin-top: 10px;
+      }
+
+      .slider-value {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 5px;
+        color: var(--secondary-grey);
+      }
+
+      .total-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border-grey);
+        margin-bottom: 15px;
+      }
+
+      .total-stat span {
+        color: var(--secondary-grey);
+      }
+
+      .total-stat b {
+        color: var(--highlight-blue);
+        font-size: 18px;
+      }
+
+      @media (max-width: 1200px) {
+
+        .column-left,
+        .column-right {
+          padding: 10px;
+        }
+
+        .filter-container {
+          padding: 10px;
+        }
+      }
+
+      .column-right {
+        padding: 20px;
+        background-color: var(--light-grey);
+        height: calc(100vh - 70px);
+        overflow: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .column-right::-webkit-scrollbar {
+        display: none;
+      }
+
+      .info-message {
+        color: var(--secondary-grey);
+        text-align: center;
+        padding: 20px;
+        font-style: italic;
+      }
+
+      .details-container {
+        background: var(--light-grey);
+        padding: 12px;
+        border-radius: 6px;
+        margin: 10px 0;
+      }
+
+      .detail-item {
+        display: flex;
+        justify-content: space-between;
+        margin: 8px 0;
+        padding: 4px 0;
+        border-bottom: 1px solid var(--border-grey);
+      }
+
+      .detail-item:last-child {
+        border-bottom: none;
+      }
+
+      .label {
+        font-weight: 500;
+        color: var(--secondary-grey);
+      }
+
+      .value {
+        color: var(--text-dark);
+      }
+
+      .route-details {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-grey);
+      }
+
+      .route-details h3 {
+        color: var(--primary-grey);
+        margin: 0 0 10px 0;
+        font-size: 16px;
+      }
+
+      .facility-info {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px dashed var(--border-grey);
+      }
+
+      .selected-pch {
+        margin-bottom: 20px;
+      }
+
+      .selected-pch h3 {
+        color: var(--primary-grey);
+        margin: 0 0 10px 0;
+        font-size: 16px;
+      }
+
+      .header-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .next-route-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 1px;
+        background-color: var(--highlight-blue);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 10px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      }
+
+      .next-route-btn:hover {
+        background-color: #2980b9;
+        transform: translateX(2px);
+      }
+
+      .next-route-btn svg {
+        transition: transform 0.2s ease;
+      }
+
+      .next-route-btn:hover svg {
+        transform: translateX(2px);
+      }
+
+      .route-ranking {
+        background-color: var(--light-grey);
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        font-size: 14px;
+        color: var(--secondary-grey);
+      }
+
+      #currentRank {
+        font-weight: 600;
+        color: var(--highlight-blue);
+      }
+
+      #maxRank {
+        font-weight: 600;
+      }
+
+      .sub-head {
+        margin-bottom: 0;
+      }
+    </style>
+  </head>
+  </head>
+  <body>
+    <div class="header">Winnipeg Personal Care Home Interactive Dashboard</div>
+    <div class="column-left">
+      <div class="filter-container">
+        <div class="sub-head">Personal Care Home Statistics</div>
+        <div class="total-stat">
+          <span>Total PCH Facilities</span>
+          <b>
+            <span id="totalpch">0</span>
+          </b>
+        </div>
+        <div class="total-stat">
+          <span>Total PCH Beds</span>
+          <b>
+            <span id="totBeds">0</span>
+          </b>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label" for="pchCommunity">Community</label>
+          <select id="pchCommunity" onchange="applyFilters()">
+            <option value="">All Communities</option>
+            <option value="Saint Boniface">Saint Boniface</option>
+            <option value="Seven Oaks">Seven Oaks</option>
+            <option value="Saint Vital">Saint Vital</option>
+            <option value="Downtown">Downtown</option>
+            <option value="River East">River East</option>
+            <option value="Assiniboine South">Assiniboine South</option>
+            <option value="Saint James">Saint James</option>
+            <option value="Inkster">Inkster</option>
+            <option value="Fort Garry">Fort Garry</option>
+            <option value="Point Douglas">Point Douglas</option>
+            <option value="River Heights">River Heights</option>
+            <option value="Transcona">Transcona</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="stats-container">
+            <span class="stat-label" id="minBeds">Min: 0</span>
+            <span class="stat-label" id="avgBeds">Avg: 0</span>
+            <span class="stat-label" id="maxBeds">Max: 0</span>
+          </div>
+          <label class="filter-label" for="pchBeds">Minimum Beds</label>
+          <div class="slider-container">
+            <input type="range" id="pchBeds" min="50" max="300" step="10" value="0">
+            <div class="slider-value">
+              <span id="bedCountDisplay">0</span> Beds
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="filter-container">
+        <div class="sub-head">Hospital Statistics</div>
+        <div class="total-stat">
+          <span>Total Hospitals</span>
+          <b>
+            <span id="totalHospital">0</span>
+          </b>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label" for="hospitalNameSelect">Hospital Name</label>
+          <select id="hospitalNameSelect">
+            <option value="">All Hospitals</option>
+            <option value="St. Boniface Hospital">St. Boniface Hospital</option>
+            <option value="Concordia Hospital">Concordia Hospital</option>
+            <option value="Grace Hospital">Grace Hospital</option>
+            <option value="Seven Oaks General Hospital">Seven Oaks General Hospital</option>
+            <option value="Victoria Hospital">Victoria Hospital</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-container">
+        <div class="sub-head">WFPS Statistics</div>
+        <div class="total-stat">
+          <span>Total WFPS Stations</span>
+          <b>
+            <span id="totalWFPS">0</span>
+          </b>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Station Type</label>
+          <div class="station-type-options">
+            <div class="radio-container">
+              <input type="radio" id="fire_only" name="station_type" value="Fire Only">
+              <label for="fire_only">Fire Only <span class="count" id="fire_only_count">(0)</span>
+              </label>
+            </div>
+            <div class="radio-container">
+              <input type="radio" id="paramedic_only" name="station_type" value="Paramedic Only">
+              <label for="paramedic_only">Paramedic Only <span class="count" id="paramedic_only_count">(0)</span>
+              </label>
+            </div>
+            <div class="radio-container">
+              <input type="radio" id="combined" name="station_type" value="Fire Paramedic Combined">
+              <label for="combined">Fire Paramedic Combined <span class="count" id="combined_count">(0)</span>
+              </label>
+            </div>
+            <div class="radio-container">
+              <input class="stationall" checked type="radio" id="all_stype" name="station_type" value="all_stype">
+              <label for="all_stype">All <span class="count" id="all_stype_count">(0)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column-map">
+      <div class="row-70">
+        <div class="map-container">
+          <div id="map"></div>
+          <span id="zoomButton">
+            <img src="https://rmnsran7.github.io/assets/images/reload.png" alt="Reload" width="40px" />
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="column-right">
+      <div class="filter-container">
+        <div class="header-actions">
+          <div class="sub-head">Route Information</div>
+          <button id="nextRouteBtn" class="next-route-btn" style="display: none"> Show Next Best Route </button>
+        </div>
+        <div id="routeRanking" class="route-ranking" style="display: none">
+          <span>Current Route Rank: </span>
+          <span id="currentRank">1</span> of <span id="maxRank">5</span>
+        </div>
+        <div id="noRouteSelected" class="info-message"> Select a Personal Care Home on the map to view route information. </div>
+        <div id="routeInfo" style="display: none;">
+          <div class="selected-pch">
+            <h3>Selected PCH</h3>
+            <div id="pchDetails" class="details-container">
+              <div class="detail-item">
+                <span class="label">Name: </span>
+                <span id="pchName" class="value">-</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Address: </span>
+                <span id="pchAddress" class="value">-</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Beds: </span>
+                <span id="pchBedCount" class="value">-</span>
+              </div>
+            </div>
+          </div>
+          <div class="route-details">
+            <h3>Hospital Route</h3>
+            <div id="hospitalRouteDetails" class="details-container">
+              <div class="detail-item">
+                <span class="label">Hospital: </span>
+                <span id="hospitalName" class="value">-</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Distance: </span>
+                <span id="hospitalDistance" class="value">-</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Est. Time: </span>
+                <span id="hospitalTime" class="value">-</span>
+              </div>
+            </div>
+            <div id="hospitalInfo" class="facility-info">
+              <div class="detail-item">
+                <span class="label">Address: </span>
+                <span id="hospitalAddress" class="value">-</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Phone: </span>
+                <span id="hospitalPhone" class="value">-</span>
+              </div>
+            </div>
+          </div>
+          <div class="route-details">
+            <h3>WFPS Route</h3>
+            <div id="wfpsRouteDetails" class="details-container">
+              <div class="detail-item">
+                <span class="label">Station: </span>
+                <span id="wfpsName" class="value">-</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Distance: </span>
+                <span id="wfpsDistance" class="value">-</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Est. Time: </span>
+                <span id="wfpsTime" class="value">-</span>
+              </div>
+            </div>
+            <div id="wfpsInfo" class="facility-info">
+              <div class="detail-item">
+                <span class="label">Type: </span>
+                <span id="wfpsType" class="value">-</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">Address: </span>
+                <span id="wfpsAddress" class="value">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="map.js"></script>
+  </body>
+</html>
