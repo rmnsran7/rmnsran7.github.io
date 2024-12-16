@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to PNG Converter (High Quality)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 4px;
+        }
+
+        #downloadLinks {
+            margin-top: 20px;
+        }
+
+        #downloadLinks a {
+            display: block;
+            margin: 5px 0;
+            color: #4CAF50;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        .quality-settings {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .quality-settings label {
+            display: inline-block;
+            margin-right: 15px;
+        }
+
+        .quality-settings input[type="number"] {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PDF to PNG Converter (High Quality)</h1>
+
+        <div class="form-group">
+            <label for="pdfFile">Select PDF File:</label>
+            <input type="file" id="pdfFile" accept=".pdf">
+        </div>
+
+        <div class="form-group">
+            <label for="startPage">Start Page:</label>
+            <input type="number" id="startPage" min="1" value="1">
+        </div>
+
+        <div class="form-group">
+            <label for="endPage">End Page:</label>
+            <input type="number" id="endPage" min="1" value="2">
+        </div>
+
+        <div class="form-group">
+            <label for="pagesPerImage">Pages per Image:</label>
+            <select id="pagesPerImage">
+                <option value="2">2 Pages</option>
+                <option value="4">4 Pages</option>
+                <option value="10">10 Pages</option>
+                <option value="20">20 Pages</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="layoutOption">Multi-Page Layout:</label>
+            <select id="layoutOption">
+                <option value="vertical">Vertical</option>
+                <option value="horizontal">Horizontal</option>
+            </select>
+        </div>
+
+        <div class="quality-settings">
+            <h3>Quality Settings</h3>
+            <div>
+                <label for="scale">Scale (1-4):</label>
+                <input type="number" id="scale" min="1" max="4" step="0.1" value="2.5">
+            </div>
+            <div>
+                <label for="quality">JPEG Quality (0-1):</label>
+                <input type="number" id="quality" min="0" max="1" step="0.1" value="1">
+            </div>
+        </div>
+
+        <button onclick="convertPages()">Convert Pages</button>
+        <div id="status"></div>
+        <div id="downloadLinks"></div>
+    </div>
+
+    <canvas id="pdfCanvas"></canvas>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+        let lastConvertedPage = 0;
+
+        async function convertPages() {
+            const startPage = parseInt(document.getElementById('startPage').value);
+            const endPage = parseInt(document.getElementById('endPage').value);
+            const pagesPerImage = parseInt(document.getElementById('pagesPerImage').value);
+            const scale = parseFloat(document.getElementById('scale').value);
+            const quality = parseFloat(document.getElementById('quality').value);
+            const layout = document.getElementById('layoutOption').value;
+            const status = document.getElementById('status');
+            const downloadLinks = document.getElementById('downloadLinks');
+            const fileInput = document.getElementById('pdfFile');
+
+            if (!fileInput.files.length) {
+                status.textContent = 'Please select a PDF file.';
+                return;
+            }
+
+            try {
+                status.textContent = 'Loading PDF...';
+                const file = fileInput.files[0];
+                const pdfData = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(pdfData).promise;
+
+                if (endPage > pdf.numPages) {
+                    status.textContent = `PDF only has ${pdf.numPages} pages.`;
+                    return;
+                }
+
+                downloadLinks.innerHTML = '';
+                status.textContent = 'Converting pages...';
+
+                for (let i = startPage; i <= endPage; i += pagesPerImage) {
+                    const maxPagesInGroup = Math.min(pagesPerImage, endPage - i + 1);
+                    const pageDetails = [];
+                    let maxWidth = 0;
+                    let maxHeight = 0;
+
+                    for (let j = 0; j < maxPagesInGroup; j++) {
+                        const currentPage = await pdf.getPage(i + j);
+                        const viewport = currentPage.getViewport({ scale: scale });
+                        
+                        pageDetails.push({ page: currentPage, viewport: viewport });
+
+                        if (layout === 'vertical') {
+                            maxWidth = Math.max(maxWidth, viewport.width);
+                            maxHeight += viewport.height;
+                        } else {
+                            maxWidth += viewport.width;
+                            maxHeight = Math.max(maxHeight, viewport.height);
+                        }
+                    }
+
+                    const combinedCanvas = document.createElement('canvas');
+                    combinedCanvas.width = maxWidth;
+                    combinedCanvas.height = maxHeight;
+                    const combinedCtx = combinedCanvas.getContext('2d');
+
+                    let currentX = 0;
+                    let currentY = 0;
+                    for (const { page, viewport } of pageDetails) {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+                        const ctx = canvas.getContext('2d');
+                        
+                        await page.render({ 
+                            canvasContext: ctx, 
+                            viewport: viewport 
+                        }).promise;
+
+                        combinedCtx.drawImage(canvas, 
+                            layout === 'vertical' ? (maxWidth - viewport.width) / 2 : currentX, 
+                            currentY
+                        );
+
+                        if (layout === 'vertical') {
+                            currentY += viewport.height;
+                        } else {
+                            currentX += viewport.width;
+                        }
+                    }
+
+                    const link = document.createElement('a');
+                    link.href = combinedCanvas.toDataURL('image/png', quality);
+                    
+                    const pageRange = maxPagesInGroup > 1 
+                        ? `pages_${i}-${i + maxPagesInGroup - 1}` 
+                        : `page_${i}`;
+                    link.download = `${pageRange}.png`;
+                    link.textContent = `Download ${pageRange}`;
+                    downloadLinks.appendChild(link);
+                }
+
+                lastConvertedPage = endPage;
+                status.textContent = 'Conversion completed! Click the links below to download.';
+                
+                document.getElementById('startPage').value = lastConvertedPage + 1;
+                document.getElementById('endPage').value = Math.min(lastConvertedPage + pagesPerImage, pdf.numPages);
+
+            } catch (error) {
+                status.textContent = 'Error: ' + error.message;
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
