@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Santa's Christmas Journey</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css' rel='stylesheet' />
+    <link href="https://fonts.googleapis.com/css2?family=Mountains+of+Christmas:wght@400;700&family=Nunito:wght@300;400&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --christmas-red: #d42426;
+            --christmas-green: #2F5233;
+            --christmas-gold: #FFD700;
+        }
+
+        body { 
+            margin: 0; 
+            padding: 0; 
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .map-header {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 1;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+        }
+        
+        .map-header h1 {
+            margin: 0;
+            color: var(--christmas-red);
+            font-family: 'Mountains of Christmas', cursive;
+            font-size: clamp(20px, 5vw, 32px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .custom-marker {
+            position: relative;
+            width: 32px;
+            height: 32px;
+        }
+
+        .santa-icon {
+            width: 100%;
+            height: 100%;
+            background-image: url('https://rmnsran7.github.io/santa_route/img/santa-sleigh.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            animation: float-tilt 2s ease-in-out infinite;
+        }
+
+        @keyframes float-tilt {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .popup-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-width: min(300px, 80vw);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease-out;
+        }
+
+        .popup-message.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .popup-message h3 {
+            margin: 0 0 8px 0;
+            color: #d42426;
+            font-size: 16px;
+        }
+
+        .popup-message p {
+            margin: 0;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .speed-control {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .speed-control:hover {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .speed-control label {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .speed-control input[type="range"] {
+            -webkit-appearance: none;
+            width: 200px;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .speed-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #d42426;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .speed-control input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .speed-control input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #d42426;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .speed-control input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .speed-value {
+            min-width: 45px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .map-header {
+                padding: 8px 15px;
+            }
+
+            .popup-message {
+                left: 20px;
+                right: 20px;
+                transform: translateY(-100%);
+            }
+
+            .popup-message.show {
+                transform: translateY(0);
+            }
+
+            .speed-control {
+                padding: 10px 20px;
+                bottom: 20px;
+            }
+
+            .speed-control input[type="range"] {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="map-header">
+        <h1>🎄 Santa's Christmas Journey in Canada 🎄</h1>
+    </div>
+    <div id="map"></div>
+    <div id="popup-container"></div>
+    <div class="speed-control">
+        <label for="speed-slider">Speed:</label>
+        <input type="range" id="speed-slider" min="0.2" max="5" step="0.1" value="1">
+        <span class="speed-value">1x</span>
+    </div>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js'></script>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoicm1uc3JhbjciLCJhIjoiY20ydDVtZnFyMDBmNjJscHNhbmlweDkzYyJ9.lUECFhg6LYHBKaea1oUy1w';
+        let cityMessages = {};
+        let speedMultiplier = 1;
+        const BASE_SPEED = 200000;
+        const BASE_POPUP_DURATION = 4500;
+        const BASE_CITY_PAUSE = 5000;
+
+        const speedSlider = document.getElementById('speed-slider');
+        const speedValue = document.querySelector('.speed-value');
+        
+        speedSlider.addEventListener('input', (e) => {
+            speedMultiplier = parseFloat(e.target.value);
+            speedValue.textContent = speedMultiplier.toFixed(1) + 'x';
+        });
+
+        fetch('https://rmnsran7.github.io/santa_route/message.json')
+            .then(response => response.json())
+            .then(messages => {
+                cityMessages = messages;
+                initializeMap();
+            })
+            .catch(error => {
+                console.error('Error loading messages:', error);
+                initializeMap();
+            });
+
+        function showPopupMessage(cityName, message) {
+            const popupContainer = document.getElementById('popup-container');
+            const popup = document.createElement('div');
+            popup.className = 'popup-message';
+            const formattedMessage = message.replace(/\n/g, '<br>');
+
+            popup.innerHTML = `
+                <h3>${cityName}</h3>
+                <p>${formattedMessage}</p>
+            `;
+            
+            popupContainer.appendChild(popup);
+            popup.offsetHeight;
+            popup.classList.add('show');
+            
+            setTimeout(() => {
+                popup.classList.remove('show');
+                setTimeout(() => {
+                    popupContainer.removeChild(popup);
+                }, 500);
+            }, BASE_POPUP_DURATION / speedMultiplier);
+        }
+
+        function calculateDistance(from, to) {
+            var R = 6371e3;
+            var lat1 = from[1] * Math.PI / 180;
+            var lat2 = to[1] * Math.PI / 180;
+            var deltaLat = (to[1] - from[1]) * Math.PI / 180;
+            var deltaLon = (to[0] - from[0]) * Math.PI / 180;
+            var a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+                    Math.cos(lat1) * Math.cos(lat2) *
+                    Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        function initializeMap() {
+            var map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v11',
+                center: [-88.9581138338269, 47.572769395554566],
+                zoom: 3.5,
+		minZoom: 3.5
+            });
+
+            
+            map.on('style.load', () => {
+                const layers = map.getStyle().layers;
+                for (const layer of layers) {
+                    if (layer.type === 'symbol') {
+                        map.removeLayer(layer.id);
+                    }
+                }
+            });
+
+            map.on('load', function () {
+                fetch('https://rmnsran7.github.io/santa_route/routes.geojson')
+                    .then(response => response.json())
+                    .then(geojson => {
+                        map.addSource('route', {
+                            'type': 'geojson',
+                            'data': geojson
+                        });
+
+                        geojson.features.forEach(function(feature, i) {
+                            map.addLayer({
+                                'id': 'route-outline-' + i,
+                                'type': 'line',
+                                'source': 'route',
+                                'layout': {
+                                    'line-join': 'round',
+                                    'line-cap': 'round'
+                                },
+                                'paint': {
+                                    'line-color': "#ffffff",
+                                    'line-width': 6
+                                },
+                                'filter': ['==', '$type', 'LineString']
+                            });
+                            
+                            map.addLayer({
+                                'id': 'route-' + i,
+                                'type': 'line',
+                                'source': 'route',
+                                'layout': {
+                                    'line-join': 'round',
+                                    'line-cap': 'round'
+                                },
+                                'paint': {
+                                    'line-color': "#ff0000",
+                                    'line-width': 3,
+                                    'line-dasharray': [2, 2]
+                                },
+                                'filter': ['==', '$type', 'LineString']
+                            });
+                        });
+
+                        fetch('https://rmnsran7.github.io/santa_route/cities.geojson')
+                            .then(response => response.json())
+                            .then(cities => {
+                                cities.features.forEach(function(city) {
+                                    city.properties.status = 'initial';
+                                    city.properties.messageShown = false;
+                                });
+
+                                map.addSource('cities', {
+                                    'type': 'geojson',
+                                    'data': cities
+                                });
+
+                                
+                                map.addLayer({
+                                    'id': 'cities',
+                                    'type': 'symbol',
+                                    'source': 'cities',
+                                    'layout': {
+                                        'icon-image': [
+                                            'case',
+                                            ['==', ['get', 'status'], 'initial'],
+                                            'initial-icon',
+                                            'reached-icon'
+                                        ],
+                                        'icon-size': 0.5,
+                                        'icon-allow-overlap': true
+                                    }
+                                });
+
+                                
+                                map.addLayer({
+                                    'id': 'city-labels',
+                                    'type': 'symbol',
+                                    'source': 'cities',
+                                    'minzoom': 5.4,
+                                    'layout': {
+                                        'text-field': ['get', 'PCNAME'],
+                                        'text-font': ['Open Sans Light'],
+                                        'text-size': 12,
+                                        'text-offset': [0, 1.5],
+                                        'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+                                        'text-radial-offset': 1,
+                                        'text-justify': 'auto',
+                                        'icon-text-fit': 'both'
+                                    },
+                                    'paint': {
+                                        'text-color': '#303030',
+                                        'text-halo-color': '#ffffff',
+                                        'text-halo-width': 2,
+                                        'text-halo-blur': 1
+                                    }
+                                });
+
+                                map.loadImage('https://rmnsran7.github.io/santa_route/img/gift.png', function(error, image) {
+                                    if (error) throw error;
+                                    map.addImage('initial-icon', image);
+                                });
+
+                                map.loadImage('https://rmnsran7.github.io/santa_route/img/gift-open.png', function(error, image) {
+                                    if (error) throw error;
+                                    map.addImage('reached-icon', image);
+                                });
+
+                                var markerContainer = document.createElement('div');
+                                markerContainer.className = 'custom-marker';
+
+                                var santaIcon = document.createElement('div');
+                                santaIcon.className = 'santa-icon';
+                                markerContainer.appendChild(santaIcon);
+
+                                var marker = new mapboxgl.Marker({
+                                    element: markerContainer
+                                })
+                                .setLngLat(geojson.features[0].geometry.coordinates[0])
+                                .addTo(map);
+
+                                setTimeout(() => {
+                                    const firstCity = cities.features[0];
+                                    showPopupMessage(firstCity.properties.PCNAME, "Santa's journey begins here! 🎅");
+                                }, 500);
+
+                                var currentLine = 0;
+                                var currentWaypoint = 0;
+
+                                function moveMarker() {
+                                    if (currentLine < geojson.features.length) {
+                                        var line = geojson.features[currentLine].geometry.coordinates;
+                                        if (currentWaypoint < line.length - 1) {
+                                            var nextWaypoint = currentWaypoint + 1;
+                                            var from = line[currentWaypoint];
+                                            var to = line[nextWaypoint];
+                                            var distance = calculateDistance(from, to);
+                                            var duration = (distance / BASE_SPEED * 1000) / speedMultiplier;
+                                            var step = 0;
+                                            var steps = 100;
+
+                                            function animateMarker() {
+                                                var lng = from[0] + (to[0] - from[0]) * (step / steps);
+                                                var lat = from[1] + (to[1] - from[1]) * (step / steps);
+                                                marker.setLngLat([lng, lat]);
+                                                
+                                                cities.features.forEach(function(city) {
+                                                    var cityCoords = city.geometry.coordinates;
+                                                    var distanceToCity = calculateDistance([lng, lat], cityCoords);
+                                                    var threshold = 2000;
+                                                    
+                                                    if (distanceToCity < threshold && !city.properties.messageShown) {
+                                                        city.properties.status = 'reached';
+                                                        city.properties.messageShown = true;
+                                                        map.getSource('cities').setData(cities);
+                                                        
+                                                        const cityName = city.properties.PCNAME;
+                                                        if (cityMessages[cityName]) {
+                                                            showPopupMessage(cityName, cityMessages[cityName]);
+                                                        }
+                                                    }
+                                                });
+
+                                                step++;
+
+                                                if (step <= steps) {
+                                                    setTimeout(animateMarker, duration / steps);
+                                                } else {
+                                                    currentWaypoint = nextWaypoint;
+                                                    setTimeout(moveMarker, BASE_CITY_PAUSE / speedMultiplier);
+                                                }
+                                            }
+                                            animateMarker();
+                                        } else {
+                                            currentLine++;
+                                            currentWaypoint = 0;
+                                            setTimeout(moveMarker, 50);
+                                        }
+                                    } else {
+                                       
+                                        setTimeout(() => {
+                                            showPopupMessage("Journey Complete", "Santa is starting another round! Merry Christmas! 🎄🎅");
+                                            
+                                           
+                                            cities.features.forEach(function(city) {
+                                                city.properties.status = 'initial';
+                                                city.properties.messageShown = false;
+                                            });
+                                            map.getSource('cities').setData(cities);
+                                            
+                                            
+                                            currentLine = 0;
+                                            currentWaypoint = 0;
+                                            marker.setLngLat(geojson.features[0].geometry.coordinates[0]);
+                                            
+                                           
+                                            setTimeout(moveMarker, BASE_CITY_PAUSE / speedMultiplier);
+                                        }, BASE_POPUP_DURATION / speedMultiplier);
+                                    }
+                                }
+
+                                setTimeout(moveMarker, 4000);
+                            });
+                    });
+            });
+
+            
+            window.addEventListener('resize', () => {
+                map.resize();
+            });
+        }
+    </script>
+</body>
+</html>
