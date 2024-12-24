@@ -1,93 +1,185 @@
 {
-  "St. John's": "🎅 Ho ho ho! Hello, St. John's! Your twinkling lights and snowy streets are so magical. I've got gifts for all the good boys and girls. Time to spread some Christmas joy before heading to Cape Breton - Sydney! 🎄✨",
-  "Cape Breton - Sydney": "🎅 Ho ho ho! Cape Breton - Sydney, your holiday spirit warms my heart! I’ve dropped off presents under your trees. Next, it’s back to St. John’s for more festive fun! 🎁🌟",
-  "Halifax": "🎅 Ho ho ho! Halifax, your Christmas tree by the harbor is magnificent! I’ve delivered presents and joy to your beautiful city. Next stop: Cape Breton - Sydney! 🎄🎅",
-  "Charlottetown": "🎅 Ho ho ho! Hello, Charlottetown! Your festive charm fills my sleigh with happiness. Presents have been delivered, and it’s off to Halifax next. Stay merry, everyone! 🎁🎄",
-  "Moncton": "🎅 Ho ho ho! Moncton, your cheerful streets make me feel right at home. Gifts are under your trees now. Next, I’m flying to Charlottetown. Merry Christmas! 🎅✨",
-  "Saint John": "🎅 Ho ho ho! Greetings, Saint John! Your holiday lights are dazzling, and I’ve left gifts for all the little ones. Next stop: Moncton. Stay jolly, Saint John! 🎄🎁",
-  "Fredericton": "🎅 Ho ho ho! Fredericton, you’ve been so good this year! Presents are delivered, and Christmas joy is in the air. Off to Saint John now. Merry Christmas! 🎅🌟",
-  "Rimouski": "🎅 Ho ho ho! Rimouski, the snow sparkles just like your holiday spirit! Gifts are under the trees, and I’m off to Fredericton. Joy to the world! 🎄🎁",
-  "Sherbrooke": "🎅 Ho ho ho! Hello, Sherbrooke! Your festive cheer is wonderful. I’ve delivered gifts and holiday magic. Next up: Drummondville. Stay merry, Sherbrooke! 🎅✨",
-  "Québec": "🎅 Ho ho ho! Québec, your old town is shining with Christmas wonder! Gifts are delivered, and my reindeer are ready for Chicoutimi - Jonquière. Joyeux Noël! 🎄🎁",
-  "Victoriaville": "🎅 Ho ho ho! Victoriaville, your holiday charm is delightful! Presents are delivered, and I’m off to Trois-Rivières. Keep the spirit alive! 🎅🌟",
-  "Chicoutimi - Jonquière": "🎅 Ho ho ho! Chicoutimi - Jonquière, your snowy streets are enchanting! Gifts are under the trees, and it’s time to head to Rimouski. Stay festive! 🎄✨",
-  "Drummondville": "🎅 Ho ho ho! Drummondville, I’ve dropped off some Christmas magic for you! Next stop: Victoriaville. Merry Christmas to all! 🎅🎁",
-  "Granby": "🎅 Ho ho ho! Granby, your homes look so cozy in the holiday glow! Gifts are delivered, and now I’m heading to Sherbrooke. Stay merry! 🎄🎅",
-  "Trois-Rivières": "🎅 Ho ho ho! Trois-Rivières, your holiday lights shine so bright! Presents are delivered, and it’s off to Shawinigan. Joyeux Noël! 🎁✨",
-  "Saint-Hyacinthe": "🎅 Ho ho ho! Hello, Saint-Hyacinthe! Your festive streets are full of joy. Presents are under the trees, and I’m off to Beloeil. Stay jolly! 🎄🎅",
-  "Saint-Jean-sur-Richelieu": "🎅 Ho ho ho! Saint-Jean-sur-Richelieu, your Christmas spirit is contagious! I’ve left gifts for everyone and now I’m off to Granby. Merry Christmas! 🎁🌟",
-  "Shawinigan": "🎅 Ho ho ho! Shawinigan, your snowy holiday magic is wonderful! Presents are delivered, and I’m flying to Québec next. Stay merry! 🎅✨",
-  "Beloeil": "🎅 Ho ho ho! Beloeil, you’ve been so good this year! I’ve delivered holiday joy and now I’m heading to Saint-Jean-sur-Richelieu. Stay festive! 🎄🎁",
-  "Sorel": "🎅 Ho ho ho! Sorel, your holiday lights twinkle like the stars! Presents are under your trees, and I’m off to Saint-Hyacinthe. Merry Christmas! 🎅✨",
-  "Joliette": "🎅 Ho ho ho! Joliette, your festive spirit lights up the night! I’ve delivered gifts, and now I’m heading to Sorel. Joyeux Noël! 🎄🎁",
-  "Montréal": "🎅 Ho ho ho! Montréal, your city sparkles like the North Pole tonight! Gifts are delivered, and now I’m off to Saint-Jérôme. Stay jolly, Montréal! 🎅🎁",
-  "Châteauguay": "🎅 Ho ho ho! Châteauguay, your cozy homes are filled with Christmas cheer! I’ve left gifts under your trees. Next stop: Montréal! 🎄✨",
-  "Salaberry-de-Valleyfield": "🎅 Ho ho ho! Salaberry-de-Valleyfield, I’ve brought festive magic just for you! Gifts are delivered, and now I’m off to Châteauguay. Stay merry! 🎅🎁",
-  "Saint-Jérôme": "🎅 Ho ho ho! Saint-Jérôme, your holiday glow is fantastic! Presents are delivered, and now I’m heading to Joliette. Merry Christmas! 🎄🌟",
-  "Cornwall": "🎅 Ho ho ho! Hello, Cornwall! I’ve spread holiday cheer and left gifts for all. Next stop: Salaberry-de-Valleyfield. Stay jolly, Cornwall! 🎅✨",
-  "Ottawa - Gatineau": "🎅 Ho ho ho! Ottawa - Gatineau, your holiday spirit is as grand as your Parliament! Presents are delivered, and now I’m heading to Cornwall. Merry Christmas! 🎄🎁",
-  "Kanata": "🎅 Ho ho ho! Kanata, I see your festive lights twinkling from the sky! Gifts are delivered, and I’m off to Ottawa - Gatineau. Stay merry! 🎅🌟",
-  "Kingston": "🎅 Ho ho ho! Kingston, your Christmas cheer is truly magical! I’ve left presents under your trees. Next stop: Kanata. Joy to the world! 🎄✨",
-  "Belleville": "🎅 Ho ho ho! Belleville, your holiday spirit is shining bright! I’ve dropped off gifts and now I’m heading to Kingston. Stay jolly, Belleville! 🎅🎁",
-  "Peterborough": "🎅 Ho ho ho! Peterborough, your snowy streets are full of Christmas magic! Presents are delivered, and I’m off to Belleville. Stay festive! 🎄🌟",
-  "Bowmanville - Newcastle": "🎅 Ho ho ho! Bowmanville - Newcastle, I’ve brought holiday joy and gifts for everyone! Next stop: Peterborough. Merry Christmas! 🎅✨",
-  "Oshawa": "🎅 Ho ho ho! Oshawa, your holiday spirit warms my heart! Gifts are under your trees, and now I’m heading to Bowmanville - Newcastle. Stay merry! 🎄🎁",
-  "St. Catharines - Niagara Falls": "🎅 Ho ho ho! St. Catharines - Niagara Falls, your holiday lights shimmer like the falls themselves! Presents are delivered, and I’m off to Hamilton. Stay festive! 🎅✨",
-  "Welland - Pelham": "🎅 Ho ho ho! Welland - Pelham, I’ve brought Christmas joy just for you! Gifts are delivered, and now I’m heading to St. Catharines - Niagara Falls. Stay merry! 🎄🎁",
-  "Stouffville": "🎅 Ho ho ho! Stouffville, your cozy town is glowing with Christmas cheer! I’ve delivered gifts, and now I’m off to Oshawa. Merry Christmas! 🎅✨",
-  "Toronto": "🎅 Ho ho ho! Toronto, your holiday lights are as bright as your spirit! I’ve left gifts for everyone, and now I’m heading to Stouffville. Stay jolly, Toronto! 🎄🎁",
-  "Orillia": "🎅 Ho ho ho! Orillia, your holiday charm is as bright as the stars! I’ve left presents for all, and now I’m off to Barrie. Stay merry and magical! 🎄🎁",
-  "Barrie": "🎅 Ho ho ho! Barrie, your festive spirit shines like the North Star! Gifts are delivered, and now I’m heading to Bradford. Merry Christmas! 🎅✨",
-  "Bradford": "🎅 Ho ho ho! Bradford, I see your homes glowing with holiday joy! Presents are under your trees, and I’m flying to Orangeville next. Stay festive! 🎄🌟",
-  "Georgetown": "🎅 Ho ho ho! Georgetown, your cozy streets are filled with Christmas cheer! I’ve dropped off gifts and now I’m off to Toronto. Have a holly jolly Christmas! 🎁✨",
-  "Brantford": "🎅 Ho ho ho! Brantford, your festive glow warms my heart! Presents are delivered, and now I’m heading to Welland - Pelham. Stay jolly! 🎄🎅",
-  "North Bay": "🎅 Ho ho ho! North Bay, your snowy landscapes are as magical as the North Pole! Gifts are delivered, and I’m off to Orillia. Stay merry, North Bay! 🎁🌟",
-  "Orangeville": "🎅 Ho ho ho! Orangeville, your holiday lights twinkle like the stars! Presents are under your trees, and now I’m flying to Guelph. Merry Christmas! 🎄✨",
-  "Guelph": "🎅 Ho ho ho! Guelph, your festive charm fills the air with joy! Gifts are delivered, and I’m off to Kitchener. Stay magical, Guelph! 🎅🎁",
-  "Kitchener": "🎅 Ho ho ho! Kitchener, your holiday spirit is shining bright! I’ve left presents for everyone, and now I’m heading to Stratford. Stay merry, Kitchener! 🎄🌟",
-  "Woodstock": "🎅 Ho ho ho! Woodstock, your Christmas cheer is contagious! I’ve delivered gifts, and now I’m off to Brantford. Stay festive, Woodstock! 🎅✨",
-  "Stratford": "🎅 Ho ho ho! Stratford, your holiday magic is truly enchanting! Gifts are delivered, and now I’m flying to Sarnia. Merry Christmas! 🎁🎄",
-  "St. Thomas": "🎅 Ho ho ho! St. Thomas, your cozy homes are filled with holiday cheer! Presents are under the trees, and now I’m off to London. Stay merry, St. Thomas! 🎅✨",
-  "London": "🎅 Ho ho ho! London, your festive glow lights up the night! I’ve delivered gifts for everyone, and now I’m off to Woodstock. Stay jolly, London! 🎄🎁",
-  "Sudbury": "🎅 Ho ho ho! Sudbury, your snowy streets are as magical as the stars above! Presents are delivered, and now I’m heading to North Bay. Merry Christmas, Sudbury! 🎅🌟",
-  "Chatham": "🎅 Ho ho ho! Chatham, your holiday spirit fills the air with joy! I’ve dropped off gifts, and now I’m off to Windsor. Stay festive, Chatham! 🎁🎄",
-  "Sarnia": "🎅 Ho ho ho! Sarnia, your holiday lights sparkle like the stars! I’ve delivered presents, and now I’m flying to Chatham. Stay merry, Sarnia! 🎅✨",
-  "Leamington": "🎅 Ho ho ho! Leamington, your cozy town is glowing with Christmas cheer! Presents are delivered, and now I’m heading to St. Thomas. Merry Christmas! 🎄🎁",
-  "Windsor": "🎅 Ho ho ho! Windsor, your festive spirit warms my heart! Gifts are delivered, and now I’m flying to Leamington. Stay magical, Windsor! 🎅🎄",
-  "Sault Ste. Marie": "🎅 Ho ho ho! Sault Ste. Marie, your snowy charm is delightful! I’ve left presents for everyone, and now I’m heading to Sudbury. Merry Christmas! 🎁✨",
-  "Thunder Bay": "🎅 Ho ho ho! Thunder Bay, your holiday glow lights up the sky! Presents are under your trees, and now I’m flying to Sault Ste. Marie. Stay jolly, Thunder Bay! 🎅🌟",
-  "Winnipeg": "🎅 Ho ho ho! Winnipeg, your festive cheer is as bright as the winter moon! Gifts are delivered, and now I’m off to Thunder Bay. Stay merry, Winnipeg! 🎄✨",
-  "Brandon": "🎅 Ho ho ho! Brandon, your snowy streets are filled with holiday magic! I’ve left gifts for all, and now I’m heading to Winnipeg. Stay merry and bright! 🎄🎁",
-  "Regina": "🎅 Ho ho ho! Regina, your festive spirit shines through the winter chill! Presents are delivered, and now I’m off to Brandon. Stay jolly, Regina! 🎅✨",
-  "Prince Albert": "🎅 Ho ho ho! Prince Albert, your holiday charm warms my heart! I’ve dropped off gifts for everyone, and now I’m flying to Saskatoon. Merry Christmas! 🎁🌟",
-  "Moose Jaw": "🎅 Ho ho ho! Moose Jaw, your cozy streets are glowing with Christmas cheer! Gifts are delivered, and now I’m off to Regina. Stay festive, Moose Jaw! 🎄✨",
-  "Saskatoon": "🎅 Ho ho ho! Saskatoon, your holiday magic is simply delightful! Presents are under your trees, and now I’m heading to Moose Jaw. Stay merry, Saskatoon! 🎅🎁",
-  "Fort McMurray": "🎅 Ho ho ho! Fort McMurray, your holiday lights sparkle like the stars! I’ve delivered gifts, and now I’m off to Edmonton. Stay joyful, Fort McMurray! 🎄🌟",
-  "Lloydminster": "🎅 Ho ho ho! Lloydminster, your festive charm bridges provinces with joy! I’ve dropped off presents, and now I’m flying to Prince Albert. Merry Christmas! 🎅✨",
-  "Medicine Hat": "🎅 Ho ho ho! Medicine Hat, your cozy town is glowing with holiday cheer! Gifts are delivered, and now I’m off to Lloydminster. Stay merry, Medicine Hat! 🎁🎄",
-  "Edmonton": "🎅 Ho ho ho! Edmonton, your festive lights shine as bright as the North Pole! I’ve left gifts for everyone, and now I’m heading to Spruce Grove. Merry Christmas, Edmonton! 🎅✨",
-  "Leduc": "🎅 Ho ho ho! Leduc, your holiday spirit fills the air with magic! Presents are under your trees, and now I’m flying to Red Deer. Stay jolly, Leduc! 🎄🎁",
-  "Spruce Grove": "🎅 Ho ho ho! Spruce Grove, your snowy streets are filled with Christmas cheer! Gifts are delivered, and now I’m off to Leduc. Stay festive, Spruce Grove! 🎅🌟",
-  "Red Deer": "🎅 Ho ho ho! Red Deer, your festive glow lights up the winter night! I’ve delivered presents, and now I’m flying to Airdrie. Merry Christmas, Red Deer! 🎁✨",
-  "Lethbridge": "🎅 Ho ho ho! Lethbridge, your holiday charm is simply delightful! Presents are delivered, and now I’m off to Medicine Hat. Stay merry, Lethbridge! 🎄🎅",
-  "Airdrie": "🎅 Ho ho ho! Airdrie, your Christmas cheer warms my heart! Gifts are under the trees, and now I’m heading to Cochrane. Stay magical, Airdrie! 🎅🎁",
-  "Calgary": "🎅 Ho ho ho! Calgary, your holiday spirit shines bright like the stars! I’ve delivered gifts, and now I’m off to Okotoks. Merry Christmas, Calgary! 🎄✨",
-  "Okotoks": "🎅 Ho ho ho! Okotoks, your festive glow fills the air with joy! I’ve dropped off presents, and now I’m heading to Lethbridge. Stay jolly, Okotoks! 🎅🌟",
-  "Cochrane": "🎅 Ho ho ho! Cochrane, your snowy charm is simply magical! Presents are delivered, and now I’m flying to Calgary. Merry Christmas, Cochrane! 🎁✨",
-  "Grande Prairie": "🎅 Ho ho ho! Grande Prairie, your holiday lights sparkle like the northern stars! Gifts are delivered, and now I’m heading to Fort McMurray. Stay merry, Grande Prairie! 🎄🎅",
-  "Vernon": "🎅 Ho ho ho! Vernon, your festive charm is simply delightful! I’ve delivered gifts, and now I’m off to Kamloops. Stay joyful, Vernon! 🎅🎁",
-  "Kelowna": "🎅 Ho ho ho! Kelowna, your holiday spirit fills the air with magic! Presents are under the trees, and now I’m flying to Vernon. Merry Christmas, Kelowna! 🎁🎄",
-  "Prince George": "🎅 Ho ho ho! Prince George, your snowy streets are glowing with holiday joy! Gifts are delivered, and now I’m off to Grande Prairie. Stay festive, Prince George! 🎄✨",
-  "Kamloops": "🎅 Ho ho ho! Kamloops, your holiday cheer lights up the mountains! Presents are under the trees, and now I’m heading to Prince George. Stay merry, Kamloops! 🎅🌟",
-  "Penticton": "🎅 Ho ho ho! Penticton, your Christmas charm warms my heart! I’ve delivered gifts, and now I’m flying to Kelowna. Merry Christmas, Penticton! 🎁✨",
-  "Chilliwack": "🎅 Ho ho ho! Chilliwack, your festive spirit shines like the stars! Gifts are delivered, and now I’m off to Penticton. Stay magical, Chilliwack! 🎄🎅",
-  "Mission": "🎅 Ho ho ho! Mission, your holiday glow fills the air with joy! Presents are under the trees, and now I’m flying to Chilliwack. Stay merry, Mission! 🎅🎁",
-  "Abbotsford": "🎅 Ho ho ho! Abbotsford, your festive charm lights up the night! I’ve delivered gifts, and now I’m heading to Mission. Merry Christmas, Abbotsford! 🎄✨",
-  "Vancouver": "🎅 Ho ho ho! Vancouver, your holiday spirit shines as bright as the city lights! Presents are delivered, and now I’m off to White Rock. Stay jolly, Vancouver! 🎅🌟",
-  "White Rock": "🎅 Ho ho ho! White Rock, your Christmas cheer warms my heart! Gifts are under the trees, and now I’m heading to Campbell River. Merry Christmas, White Rock! 🎁✨",
-  "Victoria": "🎅 Ho ho ho! Victoria, your festive glow fills the island with magic! Presents are delivered, and now I’m off to Vancouver. Stay merry, Victoria! 🎅🎄",
-  "Nanaimo": "🎅 Ho ho ho! Nanaimo, your holiday lights sparkle like the stars! I’ve delivered gifts, and now I’m heading to Victoria. Stay magical, Nanaimo! 🎅🎁",
-  "Campbell River": "🎅 Ho ho ho! Campbell River, your Christmas charm lights up the coast! Presents are delivered, and now I’m flying to Abbotsford. Merry Christmas, Campbell River! 🎄🎅",
-  "Courtenay": "🎅 Ho ho ho! Courtenay, your festive spirit is as bright as the snowflakes falling! Gifts are delivered, and now I’m off to Nanaimo. Stay joyful, Courtenay! 🎅✨"
-}
+  "St. John's": "Ho ho ho! 🎅\n\nSpreading Christmas magic in wonderful St. John's! The colorful houses are twinkling with holiday lights, making a perfect landing spot. The children here have been so good!\n\nNext stop: Cape Breton - Sydney!\n\n🎄✨",
+  
+  "Cape Breton - Sydney": "Ho ho ho! 🎅\n\nDelivering joy to Cape Breton - Sydney! The ocean breeze is helping my reindeer glide smoothly. So many stockings to fill in this charming coastal town!\n\nNext stop: Halifax!\n\n🎄✨",
+  
+  "Halifax": "Ho ho ho! 🎅\n\nLanding in historic Halifax! The harbor lights are guiding my sleigh tonight. The sweet smell of holiday treats fills the air. Everyone's been extra nice this year!\n\nNext stop: Charlottetown!\n\n🎄✨",
+  
+  "Charlottetown": "Ho ho ho! 🎅\n\nBringing Christmas cheer to lovely Charlottetown! The Victorian buildings look magical with their holiday decorations. Such wonderful holiday spirit here!\n\nNext stop: Moncton!\n\n🎄✨",
+  
+  "Moncton": "Ho ho ho! 🎅\n\nDashing through Moncton with my magical sleigh! The fresh snow makes for perfect landing conditions. My elves spotted so many cookies waiting by the fireplaces!\n\nNext stop: Saint John!\n\n🎄✨",
+  
+  "Saint John": "Ho ho ho! 🎅\n\nSpreading festive joy in Saint John! The market square is sparkling with Christmas lights. The children's wishes here are extra special!\n\nNext stop: Fredericton!\n\n🎄✨",
+  
+  "Fredericton": "Ho ho ho! 🎅\n\nMaking Christmas wishes come true in Fredericton! The city's tree-lined streets are perfect for my sleigh route. Such wonderful holiday decorations everywhere!\n\nNext stop: Rimouski!\n\n🎄✨",
+  
+  "Rimouski": "Ho ho ho! 🎅\n\nDelivering presents in beautiful Rimouski! The St. Lawrence River sparkles like tinsel tonight. My reindeer love the crisp winter air here!\n\nNext stop: Chicoutimi - Jonquière!\n\n🎄✨",
+  
+  "Chicoutimi - Jonquière": "Ho ho ho! 🎅\n\nSpreading Christmas magic in Chicoutimi - Jonquière! The snowy landscape makes perfect landing spots everywhere. Such joyful spirits in every home!\n\nNext stop: Québec!\n\n🎄✨",
+  
+  "Québec": "Ho ho ho! 🎅\n\nBringing holiday cheer to enchanting Québec! The old city walls look magical with their festive lights. The children here have such wonderful dreams!\n\nNext stop: Shawinigan!\n\n🎄✨",
+  
+  "Shawinigan": "Ho ho ho! 🎅\n\nDelivering Christmas joy to Shawinigan! The Saint-Maurice River guides my way tonight. So many excited children waiting for their presents!\n\nNext stop: Trois-Rivières!\n\n🎄✨",
+  
+  "Trois-Rivières": "Ho ho ho! 🎅\n\nSpreading holiday magic in Trois-Rivières! The historic district glows with Christmas spirit. My reindeer love resting on these snowy rooftops!\n\nNext stop: Victoriaville!\n\n🎄✨",
+  
+  "Victoriaville": "Ho ho ho! 🎅\n\nBringing presents to wonderful Victoriaville! The town squares are beautifully decorated this year. Such warm holiday welcomes everywhere!\n\nNext stop: Drummondville!\n\n🎄✨",
+  
+  "Drummondville": "Ho ho ho! 🎅\n\nSpreading Christmas cheer in Drummondville! The festive lights make perfect landing beacons. Everyone's been so good this year!\n\nNext stop: Sherbrooke!\n\n🎄✨",
+  
+  "Sherbrooke": "Ho ho ho! 🎅\n\nDelivering joy to beautiful Sherbrooke! The winter wonderland here is perfect for my sleigh. So many stockings to fill with special surprises!\n\nNext stop: Granby!\n\n🎄✨",
+  
+  "Granby": "Ho ho ho! 🎅\n\nMaking Christmas wishes come true in Granby! The snow-covered streets sparkle with holiday lights. My elves love the festive atmosphere here!\n\nNext stop: Saint-Jean-sur-Richelieu!\n\n🎄✨",
+  
+  "Saint-Jean-sur-Richelieu": "Ho ho ho! 🎅\n\nSpreading holiday magic in Saint-Jean-sur-Richelieu! The Richelieu River reflects the twinkling lights beautifully. Such jolly spirits everywhere!\n\nNext stop: Beloeil!\n\n🎄✨",
+  
+  "Beloeil": "Ho ho ho! 🎅\n\nBringing Christmas joy to charming Beloeil! Mount Saint-Hilaire makes a perfect backdrop for my sleigh. The children here have such big dreams!\n\nNext stop: Saint-Hyacinthe!\n\n🎄✨",
+  
+  "Saint-Hyacinthe": "Ho ho ho! 🎅\n\nDelivering presents in Saint-Hyacinthe! The holiday decorations light up the night sky. So many cookies and milk waiting for me!\n\nNext stop: Sorel!\n\n🎄✨",
+  
+  "Sorel": "Ho ho ho! 🎅\n\nSpreading Christmas cheer in Sorel! The confluence of rivers guides my sleigh tonight. The holiday spirit here is absolutely magical!\n\nNext stop: Joliette!\n\n🎄✨",
+  
+  "Joliette": "Ho ho ho! 🎅\n\nBringing holiday magic to Joliette! The town center is aglow with festive lights. My reindeer love the peaceful winter night here!\n\nNext stop: Saint-Jérôme!\n\n🎄✨",
+  
+  "Saint-Jérôme": "Ho ho ho! 🎅\n\nDelivering joy to Saint-Jérôme! The Laurentian mountains make perfect navigation points. Such wonderful Christmas wishes to fulfill!\n\nNext stop: Montréal!\n\n🎄✨",
+  
+  "Montréal": "Ho ho ho! 🎅\n\nSpreading Christmas magic in magnificent Montréal! Mount Royal's cross guides my way tonight. So many excited children waiting for their gifts!\n\nNext stop: Châteauguay!\n\n🎄✨",
+  
+  "Châteauguay": "Ho ho ho! 🎅\n\nBringing holiday cheer to Châteauguay! The riverside homes twinkle with festive lights. Everyone's been especially nice this year!\n\nNext stop: Salaberry-de-Valleyfield!\n\n🎄✨",
+  
+  "Salaberry-de-Valleyfield": "Ho ho ho! 🎅\n\nDelivering presents in Salaberry-de-Valleyfield! The Saint Lawrence looks like sparkling tinsel tonight. Such wonderful holiday decorations everywhere!\n\nNext stop: Cornwall!\n\n🎄✨",
+  
+  "Cornwall": "Ho ho ho! 🎅\n\nSpreading Christmas joy in Cornwall! The mighty St. Lawrence River shows my sleigh the way. The children here have such magical dreams!\n\nNext stop: Ottawa - Gatineau!\n\n🎄✨",
+  
+  "Ottawa - Gatineau": "Ho ho ho! 🎅\n\nBringing holiday magic to Ottawa - Gatineau! The Peace Tower's lights guide my sleigh tonight. So many wonderful wishes to grant here!\n\nNext stop: Kanata!\n\n🎄✨",
+  
+  "Kanata": "Ho ho ho! 🎅\n\nDelivering Christmas cheer to Kanata! The tech park's lights twinkle like stars tonight. My elves spotted so many good children here!\n\nNext stop: Kingston!\n\n🎄✨",
+  
+  "Kingston": "Ho ho ho! 🎅\n\nSpreading holiday joy in historic Kingston! The limestone buildings look magical with snow. Such wonderful Christmas spirit everywhere!\n\nNext stop: Belleville!\n\n🎄✨",
+  
+  "Belleville": "Ho ho ho! 🎅\n\nBringing presents to beautiful Belleville! The Bay of Quinte sparkles with holiday lights. Everyone's been extra good this year!\n\nNext stop: Peterborough!\n\n🎄✨",
+  
+  "Peterborough": "Ho ho ho! 🎅\n\nDelivering Christmas magic to Peterborough! The Lift Lock makes a perfect landmark for my sleigh. So many stockings to fill with joy!\n\nNext stop: Bowmanville - Newcastle!\n\n🎄✨",
+  
+  "Bowmanville - Newcastle": "Ho ho ho! 🎅\n\nSpreading holiday cheer in Bowmanville - Newcastle! The lake effect snow makes perfect landing conditions. Such festive spirit in every home!\n\nNext stop: Oshawa!\n\n🎄✨",
+  
+  "Oshawa": "Ho ho ho! 🎅\n\nBringing Christmas joy to Oshawa! The lakefront parks are perfect for reindeer rest stops. The children here have such wonderful wishes!\n\nNext stop: Stouffville!\n\n🎄✨",
+  
+  "Stouffville": "Ho ho ho! 🎅\n\nDelivering presents in charming Stouffville! The Main Street lights guide my sleigh tonight. So many cookies waiting by the chimneys!\n\nNext stop: Toronto!\n\n🎄✨",
+  
+  "Toronto": "Ho ho ho! 🎅\n\nSpreading Christmas magic in magnificent Toronto! The CN Tower's lights show my reindeer the way. Such amazing holiday spirit in this big city!\n\nNext stop: Georgetown!\n\n🎄✨",
+  
+  "Georgetown": "Ho ho ho! 🎅\n\nBringing holiday cheer to Georgetown! The historic buildings sparkle with Christmas lights. Everyone's been especially nice this year!\n\nNext stop: Milton!\n\n🎄✨",
+  
+  "Milton": "Ho ho ho! 🎅\n\nDelivering joy to growing Milton! The escarpment makes a perfect sleigh route. My reindeer love the crisp winter air here!\n\nNext stop: Hamilton!\n\n🎄✨",
+  
+  "Hamilton": "Ho ho ho! 🎅\n\nSpreading Christmas magic in Hamilton! The harbor lights twinkle like holiday stars. So many wonderful wishes to fulfill tonight!\n\nNext stop: St. Catharines - Niagara Falls!\n\n🎄✨",
+  
+  "St. Catharines - Niagara Falls": "Ho ho ho! 🎅\n\nBringing presents to St. Catharines - Niagara Falls! The Falls' mist creates magical rainbows tonight. Such festive spirit everywhere!\n\nNext stop: Welland - Pelham!\n\n🎄✨",
+  
+  "Welland - Pelham": "Ho ho ho! 🎅\n\nDelivering Christmas cheer to Welland - Pelham! The canal's lights guide my sleigh perfectly. The children here have been extra good!\n\nNext stop: Brantford!\n\n🎄✨",
+  
+  "Brantford": "Ho ho ho! 🎅\n\nSpreading holiday joy in Brantford! The Grand River valley looks magical tonight. So many stockings to fill with special gifts!\n\nNext stop: Woodstock!\n\n🎄✨",
+  
+  "Woodstock": "Ho ho ho! 🎅\n\nBringing Christmas magic to Woodstock! The historic downtown glows with holiday spirit. My elves spotted many good children here!\n\nNext stop: London!\n\n🎄✨",
+  
+  "London": "Ho ho ho! 🎅\n\nDelivering presents in Forest City London! Victoria Park's lights guide my sleigh tonight. Such wonderful Christmas wishes to grant!\n\nNext stop: St. Thomas!\n\n🎄✨",
+  
+  "St. Thomas": "Ho ho ho! 🎅\n\nSpreading holiday cheer in St. Thomas! Jumbo's spirit helps guide my way tonight. Everyone's been especially good this year!\n\nNext stop: Leamington!\n\n🎄✨",
+  
+  "Leamington": "Ho ho ho! 🎅\n\nBringing Christmas joy to Leamington! The greenhouse lights make perfect landing beacons. So many wonderful children to visit!\n\nNext stop: Windsor!\n\n🎄✨",
+  
+  "Windsor": "Ho ho ho! 🎅\n\nDelivering holiday magic to Windsor! The Ambassador Bridge lights guide my sleigh. Such festive spirit along the riverfront!\n\nNext stop: Chatham!\n\n🎄✨",
+  
+  "Chatham": "Ho ho ho! 🎅\n\nSpreading Christmas cheer in Chatham! The Thames River reflects the holiday lights beautifully. The children here have such big dreams!\n\nNext stop: Sarnia!\n\n🎄✨",
+  
+  "Sarnia": "Ho ho ho! 🎅\n\nBringing presents to Sarnia! The Blue Water Bridge twinkles like Christmas stars. My reindeer love the lake breezes here!\n\nNext stop: Stratford!\n\n🎄✨",
+  
+  "Stratford": "Ho ho ho! 🎅\n\nDelivering joy to festive Stratford! The Avon River reflects the holiday lights perfectly. Such wonderful Christmas spirit everywhere!\n\nNext stop: Kitchener!\n\n🎄✨",
+  
+  "Kitchener": "Ho ho ho! 🎅\n\nSpreading Christmas magic in Kitchener! Victoria Park's lights guide my sleigh tonight. So many excited children waiting for presents!\n\nNext stop: Guelph!\n\n🎄✨",
+  
+  "Guelph": "Ho ho ho! 🎅\n\nBringing holiday cheer to Royal City Guelph! The basilica spire makes a perfect landing guide. Everyone's been extra nice this year!\n\nNext stop: Orangeville!\n\n🎄✨",
+  
+  "Orangeville": "Ho ho ho! 🎅\n\nDelivering presents to Orangeville! The hills make perfect takeoff spots for my sleigh. Such wonderful holiday spirit here!\n\nNext stop: Bradford!\n\n🎄✨",
+  
+  "Bradford": "Ho ho ho! 🎅\n\nSpreading Christmas joy in Bradford! The Holland Marsh glows with festive lights tonight. The children here have such magical wishes!\n\nNext stop: Barrie!\n\n🎄✨",
+  
+  "Barrie": "🎅 Ho ho ho! \n✨ Delivering joy and magic to the wonderful families of Barrie! \n🦌 My reindeer love the festive lights around Kempenfelt Bay. \n🎁 Next stop: Orillia to spread more Christmas cheer!",
+  
+  "Orillia": "🎅 Merry Christmas, Orillia! \n🌟 Such warmth and holiday spirit in this charming city! \n📝 My elves tell me all the children here have been extra good. \n🛷 Time to dash to North Bay!",
 
+  "North Bay": "🎅 Ho ho ho! \n❄️ The holiday lights reflecting off Lake Nipissing are guiding my sleigh! \n🧦 So many stockings to fill with special surprises here. \n🎁 Off to Sudbury next!",
+
+  "Sudbury": "🎅 Merry Christmas, Sudbury! \n✨ The Big Nickel is shining bright with holiday spirit tonight! \n👶 Lots of good boys and girls to visit in this wonderful city. \n🛷 Sault Ste. Marie awaits!",
+
+  "Sault Ste. Marie": "🎅 Ho ho ho! \n❄️ The snowy weather here is perfect for my Christmas journey! \n🍪 I can smell delicious holiday treats from up in my sleigh. \n🎁 Thunder Bay, here comes Santa!",
+
+  "Thunder Bay": "🎅 Merry Christmas, Thunder Bay! \n⛰️ The Sleeping Giant looks magical covered in fresh snow! \n🎁 My gift bag is still full of wonderful surprises. \n🦌 Winnipeg's children are waiting!",
+
+  "Winnipeg": "🎅 Ho ho ho! \n✨ The festive spirit at The Forks warms my heart! \n👶 So many wonderful children to visit in this beautiful city. \n🛷 Time to fly to Brandon!",
+
+  "Brandon": "🎅 Merry Christmas, Brandon! \n🌟 The holiday decorations along 18th Street are spectacular! \n🦌 My reindeer are excited to visit all the good children. \n🎁 Regina is our next destination!",
+
+  "Regina": "🎅 Ho ho ho! \n❄️ Wachaskining Creek looks enchanting in the moonlight! \n🎁 I've got special presents for all the nice children here. \n✨ Off to spread joy in Moose Jaw!",
+
+  "Moose Jaw": "🎅 Merry Christmas, Moose Jaw! \n🦌 Mac the Moose is helping guide my sleigh tonight! \n🌟 The holiday spirit here is absolutely magical. \n🎁 Saskatoon's children are waiting!",
+
+  "Saskatoon": "🎅 Ho ho ho! \n✨ The South Saskatchewan River sparkles with Christmas magic! \n👶 So many good boys and girls to visit in this lovely city. \n🛷 Prince Albert, here we come!",
+
+  "Prince Albert": "🎅 Merry Christmas, Prince Albert! \n🌟 The Northern Lights are adding extra magic to our Christmas journey! \n🎁 Lots of special gifts to deliver here. \n🦌 Lloydminster is next!",
+
+  "Lloydminster": "🎅 Ho ho ho! \n✨ Spreading twice the Christmas joy in this unique border city! \n📝 My elves packed extra special presents for everyone here. \n🎁 Off to Medicine Hat!",
+
+  "Medicine Hat": "🎅 Merry Christmas, Medicine Hat! \n🌟 The world's largest teepee is sparkling with holiday lights! \n👶 So many wonderful children to visit tonight. \n🛷 Lethbridge awaits our Christmas magic!",
+
+  "Lethbridge": "🎅 Ho ho ho! \n✨ The High Level Bridge looks festive in the moonlight! \n🎁 My gift bag is filled with special surprises for all. \n🦌 Time to dash to Okotoks!",
+
+  "Okotoks": "🎅 Merry Christmas, Okotoks! \n❄️ The Big Rock has a magical dusting of Christmas snow! \n📝 All the children here have been especially good this year. \n🎁 Calgary's waiting for Santa!",
+
+  "Calgary": "🎅 Ho ho ho! \n🌟 The Calgary Tower is twinkling like my North Pole star! \n🧦 So many stockings to fill in this wonderful city. \n✨ Cochrane's children are next!",
+
+  "Cochrane": "🎅 Merry Christmas, Cochrane! \n⛰️ The holiday spirit here is as grand as the Rockies! \n🦌 My reindeer love the festive atmosphere. \n🎁 Time to spread joy in Airdrie!",
+
+  "Airdrie": "🎅 Ho ho ho! \n✨ The Festival of Lights is guiding my sleigh tonight! \n👶 Lots of good boys and girls to visit in this cheerful city. \n🛷 Red Deer is our next stop!",
+
+  "Red Deer": "🎅 Merry Christmas, Red Deer! \n🌟 The Kerry Wood Nature Centre looks magical in the moonlight! \n🎁 So many special presents to deliver here. \n🦌 Off to Leduc!",
+
+  "Leduc": "🎅 Ho ho ho! \n✨ The festive spirit here fills my heart with joy! \n📝 My elves made sure to pack extra special gifts. \n🎁 Spruce Grove's children are waiting!",
+
+  "Spruce Grove": "🎅 Merry Christmas, Spruce Grove! \n🌟 The holiday lights are brightening up the winter night! \n👶 All the children here have been so nice. \n🛷 Edmonton, here comes Santa!",
+
+  "Edmonton": "🎅 Ho ho ho! \n✨ West Edmonton Mall is sparkling with Christmas magic! \n🎁 So many wonderful families to visit in this festive city. \n🦌 Fort McMurray awaits!",
+
+  "Fort McMurray": "🎅 Merry Christmas, Fort McMurray! \n🌟 The Northern Lights are joining our Christmas celebration! \n🎁 My gift bag is still full of wonderful surprises. \n✨ Off to Grande Prairie!",
+
+  "Grande Prairie": "🎅 Ho ho ho! \n❄️ The Christmas spirit here is as vast as the prairies! \n👶 Lots of good boys and girls to visit tonight. \n🎁 Prince George is our next destination!",
+
+  "Prince George": "🎅 Merry Christmas, Prince George! \n⛰️ The fresh mountain air is perfect for my Christmas journey! \n🧦 So many stockings to fill with holiday joy. \n🛷 Kamloops awaits our magic!",
+
+  "Kamloops": "🎅 Ho ho ho! \n✨ The Thompson Rivers are twinkling with holiday cheer! \n📝 All the children here have been especially good. \n🦌 Time to dash to Vernon!",
+
+  "Vernon": "🎅 Merry Christmas, Vernon! \n🌟 The festive lights around Kalamalka Lake are magical! \n🦌 My reindeer are excited to visit all the good children. \n🎁 Kelowna's next on our list!",
+
+  "Kelowna": "🎅 Ho ho ho! \n✨ Okanagan Lake is sparkling with Christmas magic! \n👶 So many wonderful families to visit in this beautiful city. \n🛷 Penticton is waiting!",
+
+  "Penticton": "🎅 Merry Christmas, Penticton! \n🌟 The holiday spirit between the lakes is simply magical! \n🎁 Lots of special presents to deliver here. \n🦌 Off to Chilliwack!",
+
+  "Chilliwack": "🎅 Ho ho ho! \n⛰️ Mount Cheam looks festive with its snowy peak! \n📝 My elves packed extra special gifts for everyone here. \n🎁 Mission's children are waiting!",
+
+  "Mission": "🎅 Merry Christmas, Mission! \n✨ The Fraser River is reflecting all the holiday lights! \n👶 So many good boys and girls to visit tonight. \n🛷 Abbotsford awaits our Christmas magic!",
+
+  "Abbotsford": "🎅 Ho ho ho! \n🌟 The holiday spirit in the valley is simply wonderful! \n🎁 My gift bag is full of special surprises for all. \n🦌 Off to Campbell River!",
+
+  "Campbell River": "🎅 Merry Christmas, Campbell River! \n✨ The Discovery Passage looks magical in the moonlight! \n👶 All the children here have been so nice. \n🎁 White Rock is our next stop!",
+
+  "White Rock": "🎅 Ho ho ho! \n🌟 The pier is twinkling with festive lights tonight! \n🎁 So many wonderful families to visit here. \n✨ Vancouver's waiting for Santa!",
+
+  "Vancouver": "🎅 Merry Christmas, Vancouver! \n⛰️ The mountains and ocean make this night extra magical! \n👶 Lots of good boys and girls to visit in this beautiful city. \n🛷 Victoria awaits!",
+
+  "Victoria": "🎅 Ho ho ho! \n✨ The Inner Harbour is sparkling with Christmas cheer! \n🦌 My reindeer love flying over this festive capital city. \n🎁 Time to visit Nanaimo!",
+
+  "Nanaimo": "🎅 Merry Christmas, Nanaimo! \n🌟 The harbour city is filled with holiday magic tonight! \n🎁 So many special presents still to deliver. \n🦌 Off to spread joy in Courtenay!",
+
+  "Courtenay": "🎅 Ho ho ho! \n✨ The Comox Valley is looking extra festive tonight! \n🎄 What a wonderful final stop on my Vancouver Island route. \n🎁 Time to continue spreading Christmas cheer!"
+}
