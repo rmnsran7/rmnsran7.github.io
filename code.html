@@ -29,6 +29,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-top: 10px;
         }
         button:hover {
             background-color: #0056b3;
@@ -41,12 +42,15 @@
         <label for="inputText">Enter Text to Encode:</label>
         <textarea id="inputText" rows="4"></textarea>
         <button onclick="encodeText()">Encode</button>
+
         <label for="encodedText">Encoded Text:</label>
         <textarea id="encodedText" rows="4" readonly></textarea>
-        
+        <button onclick="copyEncodedText()">Copy Encoded Text</button>
+
         <label for="inputEncodedText">Enter Text to Decode:</label>
         <textarea id="inputEncodedText" rows="4"></textarea>
         <button onclick="decodeText()">Decode</button>
+        
         <label for="decodedText">Decoded Text:</label>
         <textarea id="decodedText" rows="4" readonly></textarea>
     </div>
@@ -56,6 +60,13 @@
             let text = document.getElementById('inputText').value;
             let encodedText = btoa(text);
             document.getElementById('encodedText').value = encodedText;
+        }
+
+        function copyEncodedText() {
+            let encodedText = document.getElementById('encodedText');
+            encodedText.select();
+            document.execCommand("copy");
+            alert("Encoded text copied to clipboard!");
         }
 
         function decodeText() {
