@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Base64 Encoding and Decoding</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Base64 Encoding and Decoding</h2>
+        <label for="inputText">Enter Text to Encode:</label>
+        <textarea id="inputText" rows="4"></textarea>
+        <button onclick="encodeText()">Encode</button>
+        <label for="encodedText">Encoded Text:</label>
+        <textarea id="encodedText" rows="4" readonly></textarea>
+        
+        <label for="inputEncodedText">Enter Text to Decode:</label>
+        <textarea id="inputEncodedText" rows="4"></textarea>
+        <button onclick="decodeText()">Decode</button>
+        <label for="decodedText">Decoded Text:</label>
+        <textarea id="decodedText" rows="4" readonly></textarea>
+    </div>
+
+    <script>
+        function encodeText() {
+            let text = document.getElementById('inputText').value;
+            let encodedText = btoa(text);
+            document.getElementById('encodedText').value = encodedText;
+        }
+
+        function decodeText() {
+            let encodedText = document.getElementById('inputEncodedText').value;
+            let decodedText = atob(encodedText);
+            document.getElementById('decodedText').value = decodedText;
+        }
+    </script>
+</body>
+</html>
