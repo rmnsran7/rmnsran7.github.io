@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Vocabulary Trainer</title>
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <style>
+      body {
+        font-family: 'Inter', system-ui, sans-serif;
+        line-height: 1.6;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+
+      .container {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #2d3748;
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .prompt-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      button {
+        background-color: #4a5568;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        font-size: 1rem;
+      }
+
+      button:hover {
+        background-color: #2d3748;
+      }
+
+      button:disabled {
+        background-color: #a0aec0;
+        cursor: not-allowed;
+      }
+
+      .loading {
+        text-align: center;
+        color: #4a5568;
+        padding: 2rem;
+        display: none;
+      }
+
+      .error {
+        color: #e53e3e;
+        padding: 1rem;
+        border: 1px solid #feb2b2;
+        border-radius: 6px;
+        background-color: #fff5f5;
+        margin-bottom: 1rem;
+        display: none;
+      }
+
+      .word-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background-color: #f8fafc;
+        position: relative;
+      }
+
+      .word-heading {
+        font-size: 1.5rem;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .word-heading a {
+        color: #4a5568;
+        text-decoration: none;
+        border-bottom: 2px solid #4a5568;
+      }
+
+    .back-button {
+      background-color: #4a5568;
+      color: white;
+      border: none;
+      padding: 0.40rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      font-size: 1rem;
+      display: block;
+      margin-bottom: 2rem;
+      text-align: center;
+      text-decoration: none;
+      max-width: 200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .back-button:hover {
+      background-color: #2d3748;
+    }
+
+      .learn-button {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background-color: #48bb78;
+        color: white;
+        border: none;
+        width: 0.1rem;
+        height: 2rem;
+        border-radius: 40%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+      }
+
+      .learn-button:hover {
+        background-color: #38a169;
+      }
+
+      .learn-button.learned {
+        background-color: #718096;
+        cursor: not-allowed;
+      }
+
+      .replaces {
+        font-size: 1rem;
+        color: #718096;
+        font-style: italic;
+      }
+
+      .word-meaning {
+        color: #4a5568;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+      }
+
+      .examples {
+        margin-top: 1rem;
+      }
+
+      .example {
+        margin-bottom: 0.75rem;
+        padding-left: 1rem;
+        border-left: 3px solid #4a5568;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+    <a href="learned-vocab.html" class="back-button">Learnt Words</a>
+      <h1>Professional Vocabulary Trainer</h1>
+      <div class="prompt-buttons">
+        <button onclick="generateVocabulary('callCenter')">Tech Support Vocabulary</button>
+        <button onclick="generateVocabulary('gisInterview')">GIS Interview Vocabulary</button>
+        <button onclick="generateVocabulary('generalInterview')">General Interview Vocabulary</button>
+        <button onclick="generateVocabulary('dailyComm')">Professional Daily Communication</button>
+        <button onclick="generateVocabulary('professionalCritique')">Professional Critique Vocabulary</button>
+        <button onclick="generateVocabulary('insult')">Insult Vocabulary</button>
+      </div>
+      <div id="error" class="error"></div>
+      <div id="loading" class="loading">Generating vocabulary suggestions...</div>
+      <div id="result"></div>
+    </div>
+    <script>
+      // Initialize Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyDtv_3TnfOpwX9ir-ybvuqW4yTD98JZYUQ",
+        authDomain: "vocab-bot-8e405.firebaseapp.com",
+        projectId: "vocab-bot-8e405",
+        storageBucket: "vocab-bot-8e405.firebasestorage.app",
+        messagingSenderId: "847419149701",
+        appId: "1:847419149701:web:360bb953f4d264b26c88ec",
+        measurementId: "G-GHCT0KTGD1"
+      };
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const GROQ_API_KEY = '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';
+      async function saveLearnedWord(wordData, category, button) {
+        try {
+          const wordDoc = {
+            word: wordData.word,
+            category: category,
+            replaces: wordData.replaces,
+            meaning: wordData.meaning,
+            examples: wordData.examples,
+            timestamp: new Date().toISOString()
+          };
+          await db.collection('learnedWords').doc(`${category}_${wordData.word}`).set(wordDoc);
+          button.classList.add('learned');
+          button.disabled = true;
+          console.log('Word saved successfully!');
+        } catch (error) {
+          console.error('Error saving word:', error);
+          alert('Error saving word. Please try again.');
+        }
+      }
+      async function getLearnedWords(category) {
+        try {
+          const snapshot = await db.collection('learnedWords').where('category', '==', category).get();
+          const learnedWords = [];
+          snapshot.forEach(doc => {
+            learnedWords.push(doc.data().word);
+          });
+          return learnedWords;
+        } catch (error) {
+          console.error('Error getting learned words:', error);
+          return [];
+        }
+      }
+
+      function createWordSection(wordData, category) {
+        return `
+        
+					<div class="word-section">
+						<div class="word-heading">
+							<a href="https://www.google.com/search?q=${encodeURIComponent(wordData.word)}+pronunciation" target="_blank">
+                    ${wordData.word}
+                </a>
+							<span class="replaces">replaces: "${wordData.replaces}"</span>
+						</div>
+						<button 
+                class="learn-button" 
+                data-word='${JSON.stringify(wordData).replace(/'/g, '&#39;')}' 
+                data-category="${category}"
+                onclick="handleSaveWord(this)"
+                aria-label="Mark as learned"
+            >
+                ✓
+            </button>
+						<div class="word-meaning">${wordData.meaning}</div>
+						<div class="examples">
+                ${wordData.examples.map(ex => `
+							<div class="example">${ex.trim()}</div>`).join('')}
+            
+						</div>
+					</div>
+    `;
+      }
+      async function handleSaveWord(button) {
+        try {
+          const wordDataString = button.getAttribute('data-word');
+          const category = button.getAttribute('data-category');
+          // Safely parse the JSON string
+          const wordData = JSON.parse(wordDataString);
+          // Save the word
+          await saveLearnedWord(wordData, category, button);
+        } catch (error) {
+          console.error('Error handling save:', error);
+          alert('Error saving word. Please try again.');
+        }
+      }
+
+      function parseResponse(content, category) {
+        const sections = content.split('\n\nWORD:').filter(Boolean);
+        let formattedHTML = '';
+        sections.forEach((section, index) => {
+          const lines = section.trim().split('\n');
+          try {
+            const wordData = {
+              word: lines[0].replace('WORD:', '').trim(),
+              replaces: lines[1].replace('REPLACES:', '').trim(),
+              meaning: lines[2].replace('MEANING:', '').trim(),
+              examples: lines.slice(lines.indexOf('EXAMPLES:') + 1).filter(line => line.trim().startsWith('-')).map(line => line.trim().substring(2))
+            };
+            formattedHTML += createWordSection(wordData, category);
+          } catch (error) {
+            console.error(`Error processing section ${index + 1}:`, error);
+          }
+        });
+        return formattedHTML;
+      }
+      const prompts = {
+        callCenter: `As an Apple iPhone and iPad technical support assistant, I need professional vocabulary for customer interactions. Provide exactly 3 sophisticated but easy-to-pronounce words useful in technical support conversations.
+
+For each word, include what common word or phrase it can replace. Also try to give all the examples in first person perceptive meaning how i can use them. Also try to give all the examples in first person perceptive meaning how i can use them. Format as:
+
+WORD: [word1]
+REPLACES: [common word/phrase it replaces]
+MEANING: [in really simple vocabulary, well explained and clear explanation]
+EXAMPLES:
+- [Example 1]
+- [Example 2]
+- [Example 3]
+- [Example 4]
+- [Example 5]
+
+WORD: [word2]
+[... and so on for 3 words total]`,
+        insult: `I need professional and sophisticated vocabulary to insult someone. I want to replace common insults (like fuck you, fuck off, idiot, piece of shit etc.) with more refined vocabulary.
+
+For each word, include what common word or phrase it can replace. Also try to give all the examples in first person perceptive meaning how i can use them. Format as:
+
+WORD: [word1]
+REPLACES: [common insult it replaces]
+MEANING: [in really simple vocabulary, well explained and clear explanation]
+EXAMPLES:
+- [Example 1]
+- [Example 2]
+- [Example 3]
+- [Example 4]
+- [Example 5]
+
+WORD: [word2]
+[... and so on for 3 words total]`,
+        gisInterview: `I need professional vocabulary for GIS job interviews. Provide exactly 3 sophisticated but easy-to-pronounce words useful in GIS contexts.
+
+For each word, include what common word or phrase it can replace. Also try to give all the examples in first person perceptive meaning how i can use them. Format as:
+
+WORD: [word1]
+REPLACES: [common word/phrase it replaces]
+MEANING: [in really simple vocabulary, well explained and clear explanation]
+EXAMPLES:
+- [Example 1]
+- [Example 2]
+- [Example 3]
+- [Example 4]
+- [Example 5]
+
+WORD: [word2]
+[... and so on for 3 words total]`,
+        generalInterview: `I need professional vocabulary for job interviews. Provide exactly 3 sophisticated but easy-to-pronounce words useful in interview situations.
+
+For each word, include what common word or phrase it can replace. Also try to give all the examples in first person perceptive meaning how i can use them. Format as:
+
+WORD: [word1]
+REPLACES: [common word/phrase it replaces]
+MEANING: [in really simple vocabulary, well explained and clear explanation]
+EXAMPLES:
+- [Example 1]
+- [Example 2]
+- [Example 3]
+- [Example 4]
+- [Example 5]
+
+WORD: [word2]
+[... and so on for 3 words total]`,
+        dailyComm: `I need to upgrade my daily office communication vocabulary. Provide exactly 3 sophisticated but easy-to-pronounce words to replace common everyday words.
+
+For each word, include what common word or phrase it can replace. Also try to give all the examples in first person perceptive meaning how i can use them. Format as:
+
+WORD: [word1]
+REPLACES: [common word/phrase it replaces]
+MEANING: [in really simple vocabulary, well explained and clear explanation]
+EXAMPLES:
+- [Example 1]
+- [Example 2]
+- [Example 3]
+- [Example 4]
+- [Example 5]
+
+WORD: [word2]
+[... and so on for 3 words total]`,
+        professionalCritique: `I need vocabulary for expressing disagreement professionally. Provide exactly 3 sophisticated but easy-to-pronounce words for professional critique.
+
+For each word, include what common word or phrase it can replace. Also try to give all the examples in first person perceptive meaning how i can use them. Format as:
+
+WORD: [word1]
+REPLACES: [common word/phrase it replaces]
+MEANING: [in really simple vocabulary, well explained and clear explanation]
+EXAMPLES:
+- [Example 1]
+- [Example 2]
+- [Example 3]
+- [Example 4]
+- [Example 5]
+
+WORD: [word2]
+[... and so on for 3 words total]`
+      };
+      async function generateVocabulary(promptType) {
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const resultDiv = document.getElementById('result');
+        document.querySelectorAll('button').forEach(btn => btn.disabled = true);
+        loadingDiv.style.display = 'block';
+        errorDiv.style.display = 'none';
+        resultDiv.innerHTML = '';
+        try {
+          const learnedWords = await getLearnedWords(promptType);
+          let modifiedPrompt = prompts[promptType];
+          if (learnedWords.length > 0) {
+            modifiedPrompt += `\n\nPlease do not include these words as they are already learned: ${learnedWords.join(', ')}`;
+          }
+          const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${GROQ_API_KEY}`
+            },
+            body: JSON.stringify({
+              model: 'llama-3.3-70b-versatile',
+              messages: [{
+                role: 'system',
+                content: 'You are a vocabulary teacher. Respond ONLY with the exact formatted structure specified, no other text or explanations.'
+              }, {
+                role: 'user',
+                content: modifiedPrompt
+              }]
+            })
+          });
+          if (!response.ok) {
+            throw new Error(`API request failed: ${response.statusText}`);
+          }
+          const data = await response.json();
+          resultDiv.innerHTML = parseResponse(data.choices[0].message.content, promptType);
+        } catch (error) {
+          errorDiv.textContent = `Error: ${error.message}. Please try again.`;
+          errorDiv.style.display = 'block';
+        } finally {
+          document.querySelectorAll('button').forEach(btn => btn.disabled = false);
+          loadingDiv.style.display = 'none';
+        }
+      }
+    </script>
+  </body>
+</html>
