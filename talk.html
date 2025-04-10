@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Networking Navigator Assistant</title>
+  <style>
+    /* Basic styling for our Networking Navigator app */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    header h1 {
+      margin: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
+    label {
+      font-weight: bold;
+      margin-top: 15px;
+      display: block;
+    }
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 1em;
+    }
+    textarea {
+      resize: vertical;
+    }
+    button {
+      margin: 20px 0;
+      padding: 12px 20px;
+      font-size: 1em;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+    }
+    button:disabled {
+      background-color: #8ab4f8;
+    }
+    .loading, .error, .result {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .loading {
+      display: none;
+      font-weight: bold;
+      color: #007BFF;
+    }
+    .error {
+      display: none;
+      color: red;
+    }
+    .result pre {
+      text-align: left;
+      background: #eef;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Networking Navigator Assistant</h1>
+    <p>Generate conversation openers, sample responses, and follow-up questions effortlessly</p>
+  </header>
+
+  <div class="container">
+    <!-- Input fields to capture details like location, person, job info, extra info, and tone -->
+    <form id="navigatorForm">
+      <label for="location">Location</label>
+      <input type="text" id="location" placeholder="e.g., lunchroom, coffee area" required>
+
+      <label for="person">Person</label>
+      <input type="text" id="person" placeholder="Who are you meeting? e.g., Alex or new colleague" required>
+
+      <label for="jobInfo">Job Info</label>
+      <textarea id="jobInfo" placeholder="What is their role or area of work? e.g., Environmental Consultant"></textarea>
+
+      <label for="extraInfo">Extra Info</label>
+      <textarea id="extraInfo" placeholder="Any additional details? e.g., recently attended a conference"></textarea>
+
+      <label for="tone">Tone</label>
+      <select id="tone">
+        <option value="casual">Casual</option>
+        <option value="funny">Funny</option>
+        <option value="friendly">Friendly</option>
+        <option value="professional">Professional</option>
+      </select>
+
+      <button type="submit" id="generateBtn">Get Conversation Suggestions</button>
+    </form>
+
+    <div class="loading" id="loading">Loading suggestions...</div>
+    <div class="error" id="error"></div>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    // Replace with your actual API key and update endpoint as necessary.
+    const API_KEY = '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';
+    const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+    document.getElementById('navigatorForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      await generateSuggestions();
+    });
+
+    async function generateSuggestions() {
+      const loadingDiv = document.getElementById('loading');
+      const errorDiv = document.getElementById('error');
+      const resultDiv = document.getElementById('result');
+      const generateBtn = document.getElementById('generateBtn');
+
+      // Disable the button while processing and display loading
+      generateBtn.disabled = true;
+      loadingDiv.style.display = 'block';
+      errorDiv.style.display = 'none';
+      resultDiv.innerHTML = '';
+
+      // Retrieve values from the form
+      const location = document.getElementById('location').value.trim();
+      const person = document.getElementById('person').value.trim();
+      const jobInfo = document.getElementById('jobInfo').value.trim();
+      const extraInfo = document.getElementById('extraInfo').value.trim();
+      const tone = document.getElementById('tone').value;
+
+      // Build the prompt for the Networking Navigator agent.
+      // The agent (as defined in our configuration) expects details of location, person, job info, extra info, and tone.
+      // It will then generate a JSON response containing openers, sample responses, and follow-up questions.
+      const prompt = `You are the Networking Navigator AI Assistant. I will provide you with context and you must respond ONLY with a valid JSON object exactly in the format shown below (no additional text):
+
+Input Details:
+- Location: ${location}
+- Person: ${person}
+- Job Information: ${jobInfo || "N/A"}
+- Extra Information: ${extraInfo || "N/A"}
+- Desired Tone: ${tone}
+
+Generate three conversation openers, three sample responses, and three follow-up questions. Output JSON exactly in this structure:
+
+{
+  "openers": ["...", "...", "..."],
+  "sampleResponses": ["...", "...", "..."],
+  "followUpQuestions": ["...", "...", "..."]
+}
+`;
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'grok-3-fast-beta', // or change to your preferred model as needed
+            messages: [
+              {
+                role: 'system',
+                content: 'You are a social networking AI assistant that generates conversation starters, sample responses, and follow-up questions for networking events. Respond ONLY in the strict JSON format defined.'
+              },
+              {
+                role: 'user',
+                content: prompt
+              }
+            ]
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API request failed with status: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        // The agent is expected to return exactly formatted JSON. We parse and display it.
+        let agentOutput;
+        try {
+          agentOutput = JSON.parse(data.choices[0].message.content);
+        } catch (jsonError) {
+          throw new Error('Received response is not valid JSON. Please ensure the agent returns valid JSON output.');
+        }
+
+        // Display the formatted JSON response in a <pre> block.
+        resultDiv.innerHTML = `<pre>${JSON.stringify(agentOutput, null, 2)}</pre>`;
+      } catch (error) {
+        errorDiv.textContent = `Error: ${error.message}. Please try again.`;
+        errorDiv.style.display = 'block';
+      } finally {
+        generateBtn.disabled = false;
+        loadingDiv.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
