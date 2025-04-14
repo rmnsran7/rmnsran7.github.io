@@ -1,220 +1,497 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Networking Navigator Assistant</title>
-  <style>
-    /* Basic styling for our Networking Navigator app */
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f2f5;
-      margin: 0;
-      padding: 20px;
-    }
-    header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    header h1 {
-      margin: 0;
-      color: #333;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-    }
-    label {
-      font-weight: bold;
-      margin-top: 15px;
-      display: block;
-    }
-    input[type="text"],
-    textarea,
-    select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      font-size: 1em;
-    }
-    textarea {
-      resize: vertical;
-    }
-    button {
-      margin: 20px 0;
-      padding: 12px 20px;
-      font-size: 1em;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      display: block;
-      width: 100%;
-    }
-    button:disabled {
-      background-color: #8ab4f8;
-    }
-    .loading, .error, .result {
-      text-align: center;
-      margin-top: 20px;
-    }
-    .loading {
-      display: none;
-      font-weight: bold;
-      color: #007BFF;
-    }
-    .error {
-      display: none;
-      color: red;
-    }
-    .result pre {
-      text-align: left;
-      background: #eef;
-      padding: 15px;
-      border-radius: 4px;
-      overflow-x: auto;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Small Talk Assistant</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6c8fc7;
+            --accent-color: #ff6b6b;
+            --background-color: #f5f7fa;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --light-text: #666666;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            background-color: var(--card-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: block;
+            margin: 0 auto;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .results-container {
+            display: none;
+            background-color: var(--card-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .question-card {
+            background-color: var(--background-color);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .question {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .answer {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .followup-container {
+            margin-top: 15px;
+        }
+
+        .followup-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+
+        .followup-list {
+            list-style: none;
+        }
+
+        .followup-item {
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .followup-item:last-child {
+            border-bottom: none;
+        }
+
+        .followup-item:before {
+            content: "→";
+            color: var(--accent-color);
+            margin-right: 8px;
+        }
+
+        .error-message {
+            background-color: #ffe6e6;
+            color: #cc0000;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: none;
+        }
+		
+		#modelSelect {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+    width: auto;
+    max-width: 300px;
+    display: inline-block;
+    background-color: #fafafa;
+    border-color: #ccc;
+    color: var(--light-text);
+}
+
+#modelSelect:focus {
+    border-color: var(--secondary-color);
+    background-color: #fff;
+    color: var(--text-color);
+}
+
+label[for="modelSelect"] {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .form-container, .results-container {
+                padding: 15px;
+            }
+			
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Networking Navigator Assistant</h1>
-    <p>Generate conversation openers, sample responses, and follow-up questions effortlessly</p>
-  </header>
+    <div class="container">
+        <header>
+            <h1>Small Talk Assistant</h1>
+            <p class="subtitle">Get conversation starters and follow-up questions for any work situation</p>
+        </header>
 
-  <div class="container">
-    <!-- Input fields to capture details like location, person, job info, extra info, and tone -->
-    <form id="navigatorForm">
-      <label for="location">Location</label>
-      <input type="text" id="location" placeholder="e.g., lunchroom, coffee area" required>
+        <div class="error-message" id="errorMessage"></div>
 
-      <label for="person">Person</label>
-      <input type="text" id="person" placeholder="Who are you meeting? e.g., Alex or new colleague" required>
+        <div class="form-container">
+            <div class="form-group">
+                <label for="location">Where will this conversation take place?</label>
+                <select id="location" required>
+                    <option value="" disabled selected>Select a location</option>
+                    <option value="Lunchroom">Lunchroom</option>
+                    <option value="Cubicle">Cubicle</option>
+                    <option value="Donut Day in Lunchroom">Donut Day in Lunchroom</option>
+                    <option value="Friday Beer Talk after work in Lunchroom">Friday Beer Talk after work in Lunchroom</option>
+                    <option value="Meeting Room">Meeting Room</option>
+                    <option value="1-1 Meeting">1-1 Meeting</option>
+                    <option value="Teams Meeting 1-1">Teams Meeting 1-1</option>
+                    <option value="Teams Meeting Multiple People">Teams Meeting Multiple People</option>
+                    <option value="Coffee Connect at Coffee Shop">Coffee Connect at Coffee Shop</option>
+                </select>
+            </div>
 
-      <label for="jobInfo">Job Info</label>
-      <textarea id="jobInfo" placeholder="What is their role or area of work? e.g., Environmental Consultant"></textarea>
+            <div class="form-group">
+                <label for="name">Person's Name (optional)</label>
+                <input type="text" id="name" placeholder="Enter the person's name if known">
+            </div>
 
-      <label for="extraInfo">Extra Info</label>
-      <textarea id="extraInfo" placeholder="Any additional details? e.g., recently attended a conference"></textarea>
+            <div class="form-group">
+                <label for="info">Information About the Person (optional)</label>
+                <textarea id="info" rows="3" placeholder="Enter any information you know about this person (interests, role, background, etc.)"></textarea>
+            </div>
+			<div class="form-group">
+                <label for="info">Any Extra Information (optional)</label>
+                <textarea id="inst" rows="2" placeholder="Enter any other instructions"></textarea>
+            </div>
+			
+			<div class="form-group">
+    <label for="modelSelect">Optional: Choose Model (defaults to best)</label>
+    <select id="modelSelect">
+        <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Meta)</option>
+        <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (Meta)</option>
+        <option value="qwen-2.5-32b">qwen-2.5-32b (Alibaba)</option>
+        <option value="deepseek-r1-distill-qwen-32b" selected>deepseek-r1-distill-qwen-32b (DeepSeek)</option>
+        <option value="mistral-saba-24b">mistral-saba-24b (Mistral)</option>
+    </select>
+</div>
 
-      <label for="tone">Tone</label>
-      <select id="tone">
-        <option value="casual">Casual</option>
-        <option value="funny">Funny</option>
-        <option value="friendly">Friendly</option>
-        <option value="professional">Professional</option>
-      </select>
 
-      <button type="submit" id="generateBtn">Get Conversation Suggestions</button>
-    </form>
+            <button id="generateBtn">Generate Small Talk Suggestions</button>
+        </div>
 
-    <div class="loading" id="loading">Loading suggestions...</div>
-    <div class="error" id="error"></div>
-    <div class="result" id="result"></div>
-  </div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generating conversation suggestions...</p>
+        </div>
 
-  <script>
-    // Replace with your actual API key and update endpoint as necessary.
-    const API_KEY = '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';
-    const API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+        <div class="results-container" id="resultsContainer">
+            <h2>Your Small Talk Suggestions</h2>
+            <div id="questionsContainer"></div>
+        </div>
+    </div>
 
-    document.getElementById('navigatorForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      await generateSuggestions();
-    });
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generateBtn = document.getElementById('generateBtn');
+            const locationSelect = document.getElementById('location');
+            const nameInput = document.getElementById('name');
+            const infoTextarea = document.getElementById('info');
+			const instTextarea = document.getElementById('inst');
+            const loadingDiv = document.getElementById('loading');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const questionsContainer = document.getElementById('questionsContainer');
+            const errorMessage = document.getElementById('errorMessage');
+			
 
-    async function generateSuggestions() {
-      const loadingDiv = document.getElementById('loading');
-      const errorDiv = document.getElementById('error');
-      const resultDiv = document.getElementById('result');
-      const generateBtn = document.getElementById('generateBtn');
+            // For demo purposes, we'll simulate API calls
+            // In production, replace this with your actual API call
+            generateBtn.addEventListener('click', function() {
+                // Basic validation
+                if (!locationSelect.value) {
+                    showError("Please select a location for the conversation.");
+                    return;
+                }
 
-      // Disable the button while processing and display loading
-      generateBtn.disabled = true;
-      loadingDiv.style.display = 'block';
-      errorDiv.style.display = 'none';
-      resultDiv.innerHTML = '';
+                // Show loading state
+                generateBtn.disabled = true;
+                loadingDiv.style.display = 'block';
+                resultsContainer.style.display = 'none';
+                errorMessage.style.display = 'none';
 
-      // Retrieve values from the form
-      const location = document.getElementById('location').value.trim();
-      const person = document.getElementById('person').value.trim();
-      const jobInfo = document.getElementById('jobInfo').value.trim();
-      const extraInfo = document.getElementById('extraInfo').value.trim();
-      const tone = document.getElementById('tone').value;
+                // Get input values
+                const location = locationSelect.value;
+                const name = nameInput.value;
+                const info = infoTextarea.value;
+				const inst = instTextarea.value;
 
-      // Build the prompt for the Networking Navigator agent.
-      // The agent (as defined in our configuration) expects details of location, person, job info, extra info, and tone.
-      // It will then generate a JSON response containing openers, sample responses, and follow-up questions.
-      const prompt = `You are the Networking Navigator AI Assistant. I will provide you with context and you must respond ONLY with a valid JSON object exactly in the format shown below (no additional text):
+                // In a real implementation, you would call the Grok API here
+                // For this demo, we'll simulate the API call with a timeout
+                callSmallTalkAPI(location, name, info, inst)
+                    .then(response => {
+                        // Hide loading state
+                        loadingDiv.style.display = 'none';
+                        generateBtn.disabled = false;
+                        
+                        // Display results
+                        displayResults(response);
+                        resultsContainer.style.display = 'block';
+                    })
+                    .catch(error => {
+                        // Handle errors
+                        loadingDiv.style.display = 'none';
+                        generateBtn.disabled = false;
+                        showError("Error: " + error.message);
+                    });
+            });
 
-Input Details:
-- Location: ${location}
-- Person: ${person}
-- Job Information: ${jobInfo || "N/A"}
-- Extra Information: ${extraInfo || "N/A"}
-- Desired Tone: ${tone}
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+            }
 
-Generate three conversation openers, three sample responses, and three follow-up questions. Output JSON exactly in this structure:
+			async function callSmallTalkAPI(location, name, info, inst) {
+    // Your API key - replace with your actual API key
+    // In production, this should be secured properly
+    const GROQ_API_KEY = "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";
+    const selectedModel = document.getElementById("modelSelect").value;
+	
+    try {
+        // Format the user input as a clear prompt
+        const userPrompt = `I need small talk suggestions for a conversation at ${location}${name ? ' with ' + name : ''}${info ? '. Information about this person: ' + info : ''}.
+        
+I work as a GIS Technician at Urban Systems in Canada. I'm an Indian immigrant, so I'm not very familiar with Canadian small talk customs.
 
-{
-  "openers": ["...", "...", "..."],
-  "sampleResponses": ["...", "...", "..."],
-  "followUpQuestions": ["...", "...", "..."]
-}
-`;
+Please provide at least 5 questions I could ask, with potential answers I might receive, and 3 follow-up questions for each answer.
+${inst ? 'Here are the extra instructions that you have to follow:\n' + inst : ''}`;
 
-      try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${API_KEY}`
-          },
-          body: JSON.stringify({
-            model: 'grok-3-fast-beta', // or change to your preferred model as needed
-            messages: [
-              {
-                role: 'system',
-                content: 'You are a social networking AI assistant that generates conversation starters, sample responses, and follow-up questions for networking events. Respond ONLY in the strict JSON format defined.'
-              },
-              {
-                role: 'user',
-                content: prompt
-              }
-            ]
-          })
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${GROQ_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: selectedModel || 'llama-3.3-70b-versatile', // Using the same model as your working example
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'You are a small talk expert who helps people with professional networking conversations. Format your response as a JSON object with this structure: {"questions": [{"id": 1, "question": "...", "answer": "...", "followUpQuestions": ["...", "...", "..."]}]}. Provide exactly this structure with no additional text.'
+                    },
+                    {
+                        role: 'user',
+                        content: userPrompt
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 1500
+            })
         });
-
+        
         if (!response.ok) {
-          throw new Error(`API request failed with status: ${response.statusText}`);
+            throw new Error(`API request failed: ${response.statusText}`);
         }
-
+        
         const data = await response.json();
-
-        // The agent is expected to return exactly formatted JSON. We parse and display it.
-        let agentOutput;
+        
+        // Try to parse the response as JSON
         try {
-          agentOutput = JSON.parse(data.choices[0].message.content);
-        } catch (jsonError) {
-          throw new Error('Received response is not valid JSON. Please ensure the agent returns valid JSON output.');
+            const content = data.choices[0].message.content;
+            let parsedContent;
+            
+            try {
+                // First, try to parse it as JSON directly
+                parsedContent = JSON.parse(content);
+            } catch (e) {
+                // If that fails, try to extract JSON from text
+                const jsonMatch = content.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    parsedContent = JSON.parse(jsonMatch[0]);
+                } else {
+                    throw new Error("Could not parse response as JSON");
+                }
+            }
+            
+            return parsedContent;
+        } catch (error) {
+            console.error("Error parsing API response:", error);
+            console.log("Raw response:", data);
+            throw new Error("Failed to parse the API response. Check console for details.");
         }
-
-        // Display the formatted JSON response in a <pre> block.
-        resultDiv.innerHTML = `<pre>${JSON.stringify(agentOutput, null, 2)}</pre>`;
-      } catch (error) {
-        errorDiv.textContent = `Error: ${error.message}. Please try again.`;
-        errorDiv.style.display = 'block';
-      } finally {
-        generateBtn.disabled = false;
-        loadingDiv.style.display = 'none';
-      }
+    } catch (error) {
+        console.error("API call error:", error);
+        throw error;
     }
-  </script>
+}
+
+            function displayResults(data) {
+                // Clear previous results
+                questionsContainer.innerHTML = '';
+                
+                // Process and display each question
+                data.questions.forEach(item => {
+                    const questionCard = document.createElement('div');
+                    questionCard.className = 'question-card';
+                    
+                    // Question
+                    const questionElement = document.createElement('div');
+                    questionElement.className = 'question';
+                    questionElement.textContent = item.question;
+                    questionCard.appendChild(questionElement);
+                    
+                    // Answer
+                    const answerElement = document.createElement('div');
+                    answerElement.className = 'answer';
+                    answerElement.textContent = item.answer;
+                    questionCard.appendChild(answerElement);
+                    
+                    // Follow-up questions
+                    const followupContainer = document.createElement('div');
+                    followupContainer.className = 'followup-container';
+                    
+                    const followupTitle = document.createElement('div');
+                    followupTitle.className = 'followup-title';
+                    followupTitle.textContent = 'Follow-up Questions:';
+                    followupContainer.appendChild(followupTitle);
+                    
+                    const followupList = document.createElement('ul');
+                    followupList.className = 'followup-list';
+                    
+                    item.followUpQuestions.forEach(followup => {
+                        const followupItem = document.createElement('li');
+                        followupItem.className = 'followup-item';
+                        followupItem.textContent = followup;
+                        followupList.appendChild(followupItem);
+                    });
+                    
+                    followupContainer.appendChild(followupList);
+                    questionCard.appendChild(followupContainer);
+                    
+                    // Add the card to the container
+                    questionsContainer.appendChild(questionCard);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
