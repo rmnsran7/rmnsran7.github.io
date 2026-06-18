@@ -1058,7 +1058,9 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
         let cleaned = raw.trim();
         const match = cleaned.match(/=\s*(\{[\s\S]*\})/);
         if (match) cleaned = match[1];
-        cfg = JSON.parse(cleaned);
+        // Use Function to safely evaluate JS object literals (handles unquoted keys, single quotes)
+        cfg = new Function('return ' + cleaned)();
+        if (!cfg || typeof cfg !== 'object') throw new Error('Not a valid object');
       } catch (e) {
         throw new Error('Invalid JSON: ' + e.message);
       }
