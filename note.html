@@ -1120,8 +1120,8 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
           await firebase.app().delete();
         }
         firebase.initializeApp(cfg);
-        // Connect to the specific named database 'meeting-notes' matching the Python script
-        state.db = firebase.app().firestore("meeting-notes");
+        // Connect to the specific named database 'meeting-database' matching the Python script
+        state.db = firebase.app().firestore("meeting-database");
         state.db.settings({ experimentalForceLongPolling: true, experimentalAutoDetectLongPolling: false, merge: true });
         setStatus('connected', cfg.projectId);
         toast('Connected to Firestore', 'success', 2500);
