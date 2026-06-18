@@ -879,6 +879,120 @@
         border-bottom: 1px solid var(--border);
       }
     }
+
+    /* ─── Record Panel ─── */
+    .rec-panel {
+      grid-area: top;
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      background: rgba(7, 9, 15, 0.97);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 20px;
+      height: 0;
+      overflow: hidden;
+      transition: height 0.3s ease;
+    }
+
+    .rec-panel.open {
+      height: 72px;
+    }
+
+    canvas#recViz {
+      flex: 1;
+      height: 44px;
+      border-radius: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    .rec-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .rec-timer {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--err);
+      min-width: 42px;
+    }
+
+    .rec-status {
+      font-size: 12px;
+      color: var(--muted);
+      min-width: 100px;
+    }
+
+    .btn-rec {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-rec svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+      transition: all 0.2s;
+    }
+
+    .btn-rec:hover {
+      border-color: var(--err);
+      color: var(--err);
+      box-shadow: 0 0 16px rgba(248, 113, 113, 0.2);
+    }
+
+    .btn-rec.recording {
+      border-color: var(--err);
+      color: var(--err);
+      animation: pulse-rec 1.6s infinite;
+    }
+
+    @keyframes pulse-rec {
+      0% {
+        box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 12px rgba(248, 113, 113, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+      }
+    }
+
+    .btn-mic {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-mic svg {
+      fill: none;
+    }
+
+    .btn-mic.recording {
+      color: var(--err);
+      border-color: rgba(248, 113, 113, 0.4);
+    }
   </style>
 </head>
 
@@ -904,6 +1018,14 @@
         </svg>
         Refresh
       </button>
+      <button class="btn ghost btn-mic" id="micBtn" title="Voice recording">
+        <svg width="14" height="14" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+          <path
+            d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+        </svg>
+        Record
+      </button>
       <button class="btn ghost" id="settingsBtn" title="Settings">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3" />
@@ -912,6 +1034,23 @@
         </svg>
       </button>
     </header>
+
+    <!-- Recording Panel -->
+    <div class="rec-panel" id="recPanel">
+      <canvas id="recViz"></canvas>
+      <div class="rec-controls">
+        <span class="rec-status" id="recStatus">Ready to record</span>
+        <span class="rec-timer" id="recTimer"></span>
+        <button class="btn-rec" id="recBtn" title="Start/Stop recording">
+          <svg id="recIcon" viewBox="0 0 24 24">
+            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
+            <path
+              d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+          </svg>
+        </button>
+        <button class="btn ghost" id="recCloseBtn" style="padding:5px 9px;font-size:11px;">✕</button>
+      </div>
+    </div>
 
     <aside class="sidebar">
       <div class="sidebar-header">
@@ -976,6 +1115,13 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
         </div>
       </div>
 
+      <div class="field">
+        <label>Groq API Key (optional — for voice recording transcription)</label>
+        <input type="password" id="groqKeyInput" placeholder="gsk_..." />
+        <div class="hint">Used to transcribe mic recordings via Whisper. Get a free key at
+          <strong>console.groq.com</strong>. Recordings save to the <code>voice_notes</code> collection.</div>
+      </div>
+
       <div class="modal-actions">
         <button class="btn ghost" id="cancelSettingsBtn">Cancel</button>
         <button class="btn primary" id="saveSettingsBtn">Save & Connect</button>
@@ -999,7 +1145,7 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
 
   <script type="module">
     import { initializeApp, deleteApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-    import { getFirestore, collection, doc, query, orderBy, onSnapshot, setDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { getFirestore, collection, doc, query, orderBy, onSnapshot, setDoc, getDocs, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
     // ─── State ───
     const state = {
       db: null,
@@ -1011,6 +1157,19 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       notesSaveTimer: null,
       segments: [],
       summary: '',
+      // Recording state
+      rec: {
+        isRecording: false,
+        mediaRecorder: null,
+        audioChunks: [],
+        audioContext: null,
+        analyser: null,
+        dataArray: null,
+        animationId: null,
+        stream: null,
+        timerInterval: null,
+        startTime: null,
+      },
     };
 
 
@@ -1029,9 +1188,19 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       modalTitleText: $('modalTitleText'),
       configInput: $('configInput'),
       openaiKeyInput: $('openaiKeyInput'),
+      groqKeyInput: $('groqKeyInput'),
       saveSettingsBtn: $('saveSettingsBtn'),
       cancelSettingsBtn: $('cancelSettingsBtn'),
       toastContainer: $('toastContainer'),
+      // Recording
+      micBtn: $('micBtn'),
+      recPanel: $('recPanel'),
+      recViz: $('recViz'),
+      recBtn: $('recBtn'),
+      recIcon: $('recIcon'),
+      recStatus: $('recStatus'),
+      recTimer: $('recTimer'),
+      recCloseBtn: $('recCloseBtn'),
     };
 
     // ─── Toast ───
@@ -1111,6 +1280,8 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
     function saveConfig(cfg) { localStorage.setItem('firebaseConfig', JSON.stringify(cfg)); }
     function loadOpenAIKey() { return localStorage.getItem('openaiKey') || ''; }
     function saveOpenAIKey(k) { localStorage.setItem('openaiKey', k); }
+    function loadGroqKey() { return localStorage.getItem('groqKey') || ''; }
+    function saveGroqKey(k) { localStorage.setItem('groqKey', k); }
 
     // ─── Firebase init ───
     async function connectFirebase() {
@@ -1641,6 +1812,7 @@ Transcript:
         return;
       }
       saveOpenAIKey(els.openaiKeyInput.value.trim());
+      saveGroqKey(els.groqKeyInput.value.trim());
       hideSettings();
       await connectFirebase();
     });
@@ -1648,7 +1820,21 @@ Transcript:
       if (loadConfig()) hideSettings();
       else toast('You need to paste a config to continue', 'warn');
     });
-    els.settingsBtn.addEventListener('click', () => showSettings(false));
+    els.settingsBtn.addEventListener('click', () => {
+      // Populate Groq key field before opening
+      els.groqKeyInput.value = loadGroqKey();
+      showSettings(false);
+    });
+    // Mic / Recording panel wiring
+    els.micBtn.addEventListener('click', () => {
+      els.recPanel.classList.toggle('open');
+      if (els.recPanel.classList.contains('open')) recResizeCanvas();
+    });
+    els.recBtn.addEventListener('click', recToggle);
+    els.recCloseBtn.addEventListener('click', () => {
+      if (state.rec.isRecording) { toast('Stop recording first', 'warn'); return; }
+      els.recPanel.classList.remove('open');
+    });
     els.refreshBtn.addEventListener('click', () => {
       if (!state.db) { toast('Not connected', 'warn'); return; }
       subscribeToSessions();
@@ -1698,7 +1884,150 @@ Transcript:
       return `${sec}s`;
     }
 
+    // ─── Recording ───
+    function recResizeCanvas() {
+      els.recViz.width = els.recViz.offsetWidth;
+      els.recViz.height = els.recViz.offsetHeight;
+    }
+
+    function recInitVisualizer(stream) {
+      state.rec.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      state.rec.analyser = state.rec.audioContext.createAnalyser();
+      state.rec.audioContext.createMediaStreamSource(stream).connect(state.rec.analyser);
+      state.rec.analyser.fftSize = 128;
+      state.rec.dataArray = new Uint8Array(state.rec.analyser.frequencyBinCount);
+      recDrawViz();
+    }
+
+    function recDrawViz() {
+      if (!state.rec.isRecording) return;
+      state.rec.animationId = requestAnimationFrame(recDrawViz);
+      state.rec.analyser.getByteFrequencyData(state.rec.dataArray);
+      const ctx = els.recViz.getContext('2d');
+      const w = els.recViz.width, h = els.recViz.height;
+      ctx.clearRect(0, 0, w, h);
+      const len = state.rec.dataArray.length;
+      const barW = (w / len) * 1.5;
+      const cx = w / 2;
+      let x = 0;
+      for (let i = 0; i < len; i++) {
+        const v = state.rec.dataArray[i] / 255;
+        const barH = Math.max(2, v * h * 0.85);
+        const alpha = 0.25 + v * 0.75;
+        const grad = ctx.createLinearGradient(0, (h - barH) / 2, 0, (h + barH) / 2);
+        grad.addColorStop(0, `rgba(167,139,250,${alpha})`);
+        grad.addColorStop(1, `rgba(94,234,212,${alpha})`);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(cx + x, (h - barH) / 2, barW, barH, 1);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.roundRect(cx - x - barW, (h - barH) / 2, barW, barH, 1);
+        ctx.fill();
+        x += barW + 1.5;
+      }
+    }
+
+    function recStopVisualizer() {
+      cancelAnimationFrame(state.rec.animationId);
+      const ctx = els.recViz.getContext('2d');
+      ctx.clearRect(0, 0, els.recViz.width, els.recViz.height);
+    }
+
+    function recStartTimer() {
+      state.rec.startTime = Date.now();
+      state.rec.timerInterval = setInterval(() => {
+        const s = Math.floor((Date.now() - state.rec.startTime) / 1000);
+        els.recTimer.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+      }, 500);
+    }
+    function recStopTimer() {
+      clearInterval(state.rec.timerInterval);
+      els.recTimer.textContent = '';
+      return Math.floor((Date.now() - state.rec.startTime) / 1000);
+    }
+
+    async function recToggle() {
+      if (!state.rec.isRecording) {
+        try {
+          state.rec.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          recResizeCanvas();
+          recInitVisualizer(state.rec.stream);
+          state.rec.mediaRecorder = new MediaRecorder(state.rec.stream);
+          state.rec.audioChunks = [];
+          state.rec.mediaRecorder.ondataavailable = e => state.rec.audioChunks.push(e.data);
+          state.rec.mediaRecorder.onstop = async () => {
+            const duration = recStopTimer();
+            const blob = new Blob(state.rec.audioChunks, { type: 'audio/webm' });
+            recStopVisualizer();
+            state.rec.stream.getTracks().forEach(t => t.stop());
+            await recProcess(blob, duration);
+          };
+          state.rec.mediaRecorder.start();
+          state.rec.isRecording = true;
+          recStartTimer();
+          els.recBtn.classList.add('recording');
+          els.micBtn.classList.add('recording');
+          els.recStatus.textContent = 'Recording… tap ■ to stop';
+          els.recIcon.innerHTML = '<rect x="5" y="5" width="14" height="14" rx="2" fill="currentColor"/>';
+        } catch (err) {
+          toast('Microphone access denied', 'error');
+        }
+      } else {
+        state.rec.mediaRecorder.stop();
+        state.rec.isRecording = false;
+        els.recBtn.classList.remove('recording');
+        els.micBtn.classList.remove('recording');
+        els.recStatus.textContent = 'Processing…';
+        els.recIcon.innerHTML = '<path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>';
+      }
+    }
+
+    async function recProcess(blob, durationSeconds) {
+      const groqKey = loadGroqKey();
+      if (!groqKey) {
+        els.recStatus.textContent = 'No Groq key';
+        toast('Add your Groq API key in Settings to transcribe recordings', 'warn', 5000);
+        return;
+      }
+      els.recStatus.textContent = 'Transcribing…';
+      const formData = new FormData();
+      formData.append('file', blob, 'audio.webm');
+      formData.append('model', 'whisper-large-v3');
+      try {
+        const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${groqKey}` },
+          body: formData,
+        });
+        const data = await res.json();
+        if (!data.text) throw new Error(data.error?.message || 'No text returned');
+        const text = data.text.trim();
+        if (state.db) {
+          await addDoc(collection(state.db, 'voice_notes'), {
+            text,
+            source: 'browser_recording',
+            duration_seconds: durationSeconds,
+            word_count: text.split(/\s+/).filter(Boolean).length,
+            created_at: serverTimestamp(),
+          });
+          els.recStatus.textContent = 'Saved ✓';
+          toast('Voice note saved to Firebase', 'success', 3000);
+        } else {
+          navigator.clipboard.writeText(text).catch(() => { });
+          els.recStatus.textContent = 'Copied (not connected)';
+          toast('Not connected to Firebase — transcript copied to clipboard', 'warn', 4000);
+        }
+        setTimeout(() => { els.recStatus.textContent = 'Ready to record'; }, 3000);
+      } catch (err) {
+        console.error(err);
+        els.recStatus.textContent = 'Transcription failed';
+        toast('Transcription failed: ' + err.message, 'error', 5000);
+      }
+    }
+
     // ─── Init ───
+    window.addEventListener('resize', recResizeCanvas);
     window.addEventListener('DOMContentLoaded', () => {
       connectFirebase();
     });
