@@ -899,10 +899,12 @@
       z-index: 50;
       transition: all 0.25s ease;
     }
+
     .fab-mic:hover {
       transform: scale(1.08);
       box-shadow: 0 15px 35px rgba(94, 234, 212, 0.6);
     }
+
     .fab-mic svg {
       width: 28px;
       height: 28px;
@@ -923,6 +925,7 @@
       pointer-events: none;
       transition: opacity 0.3s ease;
     }
+
     .rec-overlay.open {
       opacity: 1;
       pointer-events: auto;
@@ -956,7 +959,10 @@
       font-size: 20px;
       transition: all 0.2s;
     }
-    .rec-close-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+    .rec-close-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
 
     canvas#recViz {
       width: 100%;
@@ -998,28 +1004,182 @@
     .btn-rec svg {
       width: 40px;
       height: 40px;
-      fill: currentColor;
-      transition: all 0.2s;
-    }
 
-    .btn-rec:hover {
-      border-color: var(--err);
-      color: var(--err);
-      box-shadow: 0 0 30px rgba(248, 113, 113, 0.3);
-      transform: scale(1.05);
-    }
+      .btn-rec:hover {
+        border-color: var(--err);
+        color: var(--err);
+        box-shadow: 0 0 30px rgba(248, 113, 113, 0.3);
+        transform: scale(1.05);
+      }
 
-    .btn-rec.recording {
-      border-color: var(--err);
-      color: var(--err);
-      animation: pulse-rec-big 1.8s infinite;
-    }
+      .btn-mic.recording {
+        color: var(--err);
+        border-color: rgba(248, 113, 113, 0.4);
+      }
 
-    @keyframes pulse-rec-big {
-      0% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.5); }
-      70% { box-shadow: 0 0 0 30px rgba(248, 113, 113, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
-    }
+      /* ─── Pinned Nav & Dashboard ─── */
+      .pinned-nav {
+        padding: 12px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .pinned-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        color: var(--muted);
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .pinned-item:hover {
+        background: var(--surface);
+        color: var(--text);
+      }
+
+      .pinned-item.active {
+        background: rgba(167, 139, 250, 0.1);
+        color: var(--accent);
+        border: 1px solid rgba(167, 139, 250, 0.2);
+      }
+
+      .pinned-item svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .dashboard {
+        padding: 40px;
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        animation: fadein 0.3s ease;
+      }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .dashboard-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      .add-form {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .add-form input,
+      .add-form textarea {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 12px;
+        border-radius: 8px;
+        font-family: inherit;
+        resize: vertical;
+      }
+
+      .add-form input:focus,
+      .add-form textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+
+      .add-form button {
+        align-self: flex-end;
+      }
+
+      .dash-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .item-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        position: relative;
+      }
+
+      .item-card-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        padding-right: 40px;
+      }
+
+      .item-card-desc {
+        color: var(--muted);
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+
+      .item-card-date {
+        font-size: 12px;
+        color: var(--dim);
+        margin-top: 16px;
+      }
+
+      .item-delete-btn {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        color: var(--dim);
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+      }
+
+      .item-delete-btn:hover {
+        color: var(--err);
+        background: rgba(248, 113, 113, 0.1);
+      }
+
+      .btn-rec.recording {
+        border-color: var(--err);
+        color: var(--err);
+        animation: pulse-rec-big 1.8s infinite;
+      }
+
+      @keyframes pulse-rec-big {
+        0% {
+          box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.5);
+        }
+
+        70% {
+          box-shadow: 0 0 0 30px rgba(248, 113, 113, 0);
+        }
+
+        100% {
+          box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+        }
+      }
   </style>
 </head>
 
@@ -1059,7 +1219,8 @@
     <button class="fab-mic" id="micBtn" title="Voice recording">
       <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z" />
-        <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+        <path
+          d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
       </svg>
     </button>
 
@@ -1081,7 +1242,7 @@
 
     <aside class="sidebar">
       <div class="sidebar-header">
-        <div class="sidebar-title">Sessions</div>
+        <div class="sidebar-title">Workspace</div>
         <div class="search-wrap">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="11" cy="11" r="8" />
@@ -1090,6 +1251,26 @@
           <input type="text" class="search" id="searchInput" placeholder="Search sessions..." />
         </div>
       </div>
+
+      <div class="pinned-nav">
+        <div class="pinned-item" data-id="SPECIAL_PROJECTS">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+          </svg>
+          Active Projects
+        </div>
+        <div class="pinned-item" data-id="SPECIAL_NOTES">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+            <polyline points="10 9 9 9 8 9" />
+          </svg>
+          General Notes
+        </div>
+      </div>
+
       <div class="session-list" id="sessionList">
         <div class="empty-state">No sessions yet.<br />Start recording with the Python script.</div>
       </div>
@@ -1146,7 +1327,8 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
         <label>Groq API Key (optional — for voice recording transcription)</label>
         <input type="password" id="groqKeyInput" placeholder="gsk_..." />
         <div class="hint">Used to transcribe mic recordings via Whisper. Get a free key at
-          <strong>console.groq.com</strong>. Recordings save to the <code>voice_notes</code> collection.</div>
+          <strong>console.groq.com</strong>. Recordings save to the <code>voice_notes</code> collection.
+        </div>
       </div>
 
       <div class="modal-actions">
@@ -1172,7 +1354,7 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
 
   <script type="module">
     import { initializeApp, deleteApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-    import { getFirestore, collection, doc, query, orderBy, onSnapshot, setDoc, getDocs, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { getFirestore, collection, doc, query, orderBy, onSnapshot, setDoc, getDocs, addDoc, deleteDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
     // ─── State ───
     const state = {
       db: null,
@@ -1181,7 +1363,11 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       currentSession: null,
       unsubscribeSessions: null,
       unsubscribeVoiceNotes: null,
+      unsubscribeProjects: null,
+      unsubscribeNotes: null,
       unsubscribeSegments: null,
+      projects: [],
+      notes: [],
       notesSaveTimer: null,
       segments: [],
       summary: '',
@@ -1342,6 +1528,8 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
     function subscribeToSessions() {
       if (state.unsubscribeSessions) state.unsubscribeSessions();
       if (state.unsubscribeVoiceNotes) state.unsubscribeVoiceNotes();
+      if (state.unsubscribeProjects) state.unsubscribeProjects();
+      if (state.unsubscribeNotes) state.unsubscribeNotes();
 
       let liveCaptions = [];
       let voiceNotes = [];
@@ -1387,6 +1575,18 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
           },
           (err) => console.error(err)
         );
+
+        const qProj = query(collection(state.db, 'active_projects'), orderBy('created_at', 'desc'));
+        state.unsubscribeProjects = onSnapshot(qProj, snap => {
+          state.projects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          if (state.currentSessionId === 'SPECIAL_PROJECTS') renderMain();
+        });
+
+        const qNote = query(collection(state.db, 'general_notes'), orderBy('created_at', 'desc'));
+        state.unsubscribeNotes = onSnapshot(qNote, snap => {
+          state.notes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          if (state.currentSessionId === 'SPECIAL_NOTES') renderMain();
+        });
       } catch (err) {
         toast('Failed to subscribe: ' + err.message, 'error');
       }
@@ -1433,10 +1633,20 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       els.sessionList.querySelectorAll('.session-item').forEach(el => {
         el.addEventListener('click', () => selectSession(el.dataset.id));
       });
+      document.querySelectorAll('.pinned-item').forEach(el => {
+        if (el.dataset.id === state.currentSessionId) el.classList.add('active');
+        else el.classList.remove('active');
+      });
     }
 
     async function selectSession(id) {
       state.currentSessionId = id;
+      if (id === 'SPECIAL_PROJECTS' || id === 'SPECIAL_NOTES') {
+        state.currentSession = null;
+        renderSessionList();
+        renderMain();
+        return;
+      }
       state.currentSession = state.sessions.find(s => s.id === id);
       renderSessionList();
       renderMain();
@@ -1448,7 +1658,77 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       }
     }
 
+    function getDashboardHTML(title, items, placeholderTitle, placeholderDesc) {
+      const listHtml = items.map(item => `
+        <div class="item-card">
+          <button class="item-delete-btn" data-id="${item.id}" title="Delete"><svg style="pointer-events:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+          <div class="item-card-title">${escapeHtml(item.title)}</div>
+          <div class="item-card-desc">${escapeHtml(item.description || '')}</div>
+          <div class="item-card-date">${formatDateTime(item.created_at)}</div>
+        </div>
+      `).join('');
+
+      return `
+        <div class="dashboard">
+          <div class="dashboard-header">
+            <div class="dashboard-title">${title}</div>
+          </div>
+          <div class="add-form">
+            <input type="text" id="dashInputTitle" placeholder="${placeholderTitle}" />
+            <textarea id="dashInputDesc" rows="3" placeholder="${placeholderDesc}"></textarea>
+            <button class="btn" id="dashBtnAdd">Save</button>
+          </div>
+          <div class="dash-list">
+            ${listHtml || '<div class="empty-state">No items yet.</div>'}
+          </div>
+        </div>
+      `;
+    }
+
+    function bindDashboardEvents(collName) {
+      const btnAdd = document.getElementById('dashBtnAdd');
+      const inputTitle = document.getElementById('dashInputTitle');
+      const inputDesc = document.getElementById('dashInputDesc');
+
+      btnAdd.addEventListener('click', async () => {
+        const title = inputTitle.value.trim();
+        const desc = inputDesc.value.trim();
+        if (!title) return toast('Title is required', 'warn');
+        try {
+          await addDoc(collection(state.db, collName), {
+            title, description: desc, created_at: serverTimestamp()
+          });
+          inputTitle.value = '';
+          inputDesc.value = '';
+          toast('Saved successfully', 'success', 2000);
+        } catch (err) { toast(err.message, 'error'); }
+      });
+
+      document.querySelectorAll('.item-delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = e.target.dataset.id;
+          if (!confirm('Are you sure you want to delete this?')) return;
+          try {
+            await deleteDoc(doc(state.db, collName, id));
+            toast('Deleted', 'success', 2000);
+          } catch (err) { toast(err.message, 'error'); }
+        });
+      });
+    }
+
     function renderMain() {
+      const id = state.currentSessionId;
+      if (id === 'SPECIAL_PROJECTS') {
+        els.mainContent.innerHTML = getDashboardHTML('Active Projects', state.projects, 'Project Name', 'Description or notes...');
+        bindDashboardEvents('active_projects');
+        return;
+      }
+      if (id === 'SPECIAL_NOTES') {
+        els.mainContent.innerHTML = getDashboardHTML('General Notes', state.notes, 'Note Title', 'Write your note here...');
+        bindDashboardEvents('general_notes');
+        return;
+      }
+
       const s = state.currentSession;
       if (!s) {
         els.mainContent.innerHTML = `
@@ -1473,8 +1753,9 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
 
       els.mainContent.innerHTML = `
     <div class="main-header">
-      <div class="title-row">
-        <input type="text" class="title-input" id="titleInput" value="${escapeAttr(title)}" placeholder="${isRec ? 'Voice Note...' : 'Untitled meeting...'}" />
+      <div class="title-row" style="display: flex; gap: 12px; align-items: center;">
+        <input type="text" class="title-input" id="titleInput" value="${escapeAttr(title)}" placeholder="${isRec ? 'Voice Note...' : 'Untitled meeting...'}" style="flex:1;" />
+        <button class="btn ghost" id="btnDeleteSession" style="color: var(--err); border-color: rgba(248,113,113,0.3); padding: 6px 12px; height: 32px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Delete</button>
       </div>
       <div class="meta-row">
         <div class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${isRec ? 'Recorded' : 'Started'} <strong>${started}</strong></div>
@@ -1583,15 +1864,34 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       if (copyBtn) copyBtn.addEventListener('click', copySummary);
       const copyPromptBtn = $('copyPromptBtn');
       if (copyPromptBtn) copyPromptBtn.addEventListener('click', copyPrompt);
+
+      const btnDeleteSession = $('btnDeleteSession');
+      if (btnDeleteSession) {
+        btnDeleteSession.addEventListener('click', async () => {
+          if (!confirm('Are you sure you want to delete this session? This cannot be undone.')) return;
+          const coll = state.currentSession.source === 'browser_recording' ? 'voice_notes' : 'live_captions';
+          try {
+            await deleteDoc(doc(state.db, coll, state.currentSessionId));
+            toast('Session deleted', 'success');
+            state.currentSessionId = null;
+            state.currentSession = null;
+            renderSessionList();
+            renderMain();
+          } catch (err) {
+            toast('Failed to delete: ' + err.message, 'error');
+          }
+        });
+      }
     }
 
     async function saveTitle() {
-      if (!state.currentSessionId || !state.db) return;
+      if (!state.currentSessionId || !state.db || !state.currentSession) return;
       const titleInput = $('titleInput');
       if (!titleInput) return;
       const newTitle = titleInput.value.trim();
+      const coll = state.currentSession.source === 'browser_recording' ? 'voice_notes' : 'live_captions';
       try {
-        await setDoc(doc(state.db, 'live_captions', state.currentSessionId), { title: newTitle }, { merge: true });
+        await setDoc(doc(state.db, coll, state.currentSessionId), { title: newTitle }, { merge: true });
         state.currentSession.title = newTitle;
         const s = state.sessions.find(x => x.id === state.currentSessionId);
         if (s) s.title = newTitle;
@@ -1603,13 +1903,14 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
     }
 
     async function saveNotes() {
-      if (!state.currentSessionId || !state.db) return;
+      if (!state.currentSessionId || !state.db || !state.currentSession) return;
       const notesArea = $('notesArea');
       if (!notesArea) return;
       const notes = notesArea.value;
       const notesStatus = $('notesStatus');
+      const coll = state.currentSession.source === 'browser_recording' ? 'voice_notes' : 'live_captions';
       try {
-        await setDoc(doc(state.db, 'live_captions', state.currentSessionId), { notes }, { merge: true });
+        await setDoc(doc(state.db, coll, state.currentSessionId), { notes }, { merge: true });
         state.currentSession.notes = notes;
         if (notesStatus) {
           notesStatus.className = 'notes-status saved';
@@ -1885,8 +2186,9 @@ Transcript:
     });
     // Mic / Recording panel wiring
     els.micBtn.addEventListener('click', () => {
-      els.recPanel.classList.toggle('open');
-      if (els.recPanel.classList.contains('open')) recResizeCanvas();
+      els.recPanel.classList.add('open');
+      recResizeCanvas();
+      if (!state.rec.isRecording) recToggle();
     });
     els.recBtn.addEventListener('click', recToggle);
     els.recCloseBtn.addEventListener('click', () => {
@@ -2036,8 +2338,8 @@ Transcript:
         state.rec.isRecording = false;
         els.recBtn.classList.remove('recording');
         els.micBtn.classList.remove('recording');
-        els.recStatus.textContent = 'Processing…';
-        els.recIcon.innerHTML = '<path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>';
+        els.recPanel.classList.remove('open');
+        toast('Processing recording...', 'info');
       }
     }
 
@@ -2073,13 +2375,10 @@ Transcript:
           toast('Voice note saved to Firebase', 'success', 3000);
         } else {
           navigator.clipboard.writeText(text).catch(() => { });
-          els.recStatus.textContent = 'Copied (not connected)';
           toast('Not connected to Firebase — transcript copied to clipboard', 'warn', 4000);
         }
-        setTimeout(() => { els.recStatus.textContent = 'Ready to record'; }, 3000);
       } catch (err) {
         console.error(err);
-        els.recStatus.textContent = 'Transcription failed';
         toast('Transcription failed: ' + err.message, 'error', 5000);
       }
     }
@@ -2087,6 +2386,10 @@ Transcript:
     // ─── Init ───
     window.addEventListener('resize', recResizeCanvas);
     window.addEventListener('DOMContentLoaded', () => {
+      // Wire pinned items on load
+      document.querySelectorAll('.pinned-item').forEach(el => {
+        el.addEventListener('click', () => selectSession(el.dataset.id));
+      });
       connectFirebase();
     });
 
