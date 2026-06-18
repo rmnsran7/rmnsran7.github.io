@@ -877,9 +877,7 @@
 
 <body>
 
-  <!-- Firebase Compat (Non-Module) -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <!-- Firebase SDK loaded as ES modules in the script block below -->
 
   <div class="app">
     <header class="topbar">
@@ -992,7 +990,9 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
 
   <div class="toast-container" id="toastContainer"></div>
 
-  <script>
+  <script type="module">
+    import { initializeApp, deleteApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getFirestore, collection, doc, query, orderBy, onSnapshot, setDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
     // ─── State ───
     const state = {
       db: null,
@@ -1116,13 +1116,11 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       try {
         setStatus('connecting', 'Connecting...');
         // Delete existing app if it exists
-        if (firebase.apps.length > 0) {
-          await firebase.app().delete();
-        }
-        firebase.initializeApp(cfg);
-        // Connect to the specific named database 'meeting-database' matching the Python script
-        state.db = firebase.app().firestore("meeting-database");
-        state.db.settings({ experimentalForceLongPolling: true, experimentalAutoDetectLongPolling: false, merge: true });
+        const existingApps = getApps();
+        for (const a of existingApps) await deleteApp(a);
+        const app = initializeApp(cfg);
+        // Connect to the named database 'meeting-database'
+        state.db = getFirestore(app, 'meeting-database');
         setStatus('connected', cfg.projectId);
         toast('Connected to Firestore', 'success', 2500);
         subscribeToSessions();
@@ -1138,8 +1136,8 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
     function subscribeToSessions() {
       if (state.unsubscribeSessions) state.unsubscribeSessions();
       try {
-        const q = state.db.collection('live_captions').orderBy('started_at', 'desc');
-        state.unsubscribeSessions = q.onSnapshot(
+        const q = query(collection(state.db, 'live_captions'), orderBy('started_at', 'desc'));
+        state.unsubscribeSessions = onSnapshot(q,
           (snap) => {
             state.sessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             renderSessionList();
@@ -1357,7 +1355,7 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       if (!titleInput) return;
       const newTitle = titleInput.value.trim();
       try {
-        await state.db.collection('live_captions').doc(state.currentSessionId).set({ title: newTitle }, { merge: true });
+        await setDoc(doc(state.db, 'live_captions', state.currentSessionId), { title: newTitle }, { merge: true });
         state.currentSession.title = newTitle;
         const s = state.sessions.find(x => x.id === state.currentSessionId);
         if (s) s.title = newTitle;
@@ -1375,7 +1373,7 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       const notes = notesArea.value;
       const notesStatus = $('notesStatus');
       try {
-        await state.db.collection('live_captions').doc(state.currentSessionId).set({ notes }, { merge: true });
+        await setDoc(doc(state.db, 'live_captions', state.currentSessionId), { notes }, { merge: true });
         state.currentSession.notes = notes;
         if (notesStatus) {
           notesStatus.className = 'notes-status saved';
@@ -1432,8 +1430,8 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
     async function loadSegments(sessionId) {
       if (state.unsubscribeSegments) state.unsubscribeSegments();
       try {
-        const q = state.db.collection('live_captions').doc(sessionId).collection('segments').orderBy('sequence');
-        state.unsubscribeSegments = q.onSnapshot(
+        const q = query(collection(state.db, 'live_captions', sessionId, 'segments'), orderBy('sequence'));
+        state.unsubscribeSegments = onSnapshot(q,
           (snap) => {
             state.segments = snap.docs.map(d => d.data());
             if (state.currentSession && !state.currentSession.full_transcript) {
