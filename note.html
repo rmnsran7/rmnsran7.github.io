@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LiveCaptions Console</title>
+  <style>
+    :root {
+      --bg: #07090f;
+      --bg-2: #0b0f1a;
+      --surface: rgba(255, 255, 255, 0.035);
+      --surface-2: rgba(255, 255, 255, 0.06);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --text: #e6edf6;
+      --muted: #8b97ad;
+      --dim: #5a6680;
+      --accent: #5eead4;
+      --accent-2: #a78bfa;
+      --warn: #fbbf24;
+      --err: #f87171;
+      --ok: #4ade80;
+      --mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', Consolas, monospace;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 20% 0%, rgba(94, 234, 212, 0.07), transparent 60%),
+        radial-gradient(ellipse 60% 50% at 90% 100%, rgba(167, 139, 250, 0.06), transparent 60%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      background-attachment: fixed;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.16);
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      grid-template-rows: 56px 1fr;
+      grid-template-areas: "top top" "side main";
+      height: 100vh;
+    }
+
+    .topbar {
+      grid-area: top;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 20px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(7, 9, 15, 0.6);
+      backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      font-size: 14px;
+    }
+
+    .logo-mark {
+      width: 26px;
+      height: 26px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(94, 234, 212, 0.3);
+      position: relative;
+    }
+
+    .logo-mark::before {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      background: var(--bg);
+      border-radius: 5px;
+    }
+
+    .logo-mark::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: 2px;
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(0.7);
+        opacity: 0.6;
+      }
+    }
+
+    .logo span.dim {
+      color: var(--dim);
+      font-weight: 400;
+    }
+
+    .topbar-spacer {
+      flex: 1;
+    }
+
+    .status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--dim);
+      transition: all 0.3s;
+    }
+
+    .status-dot.connected {
+      background: var(--ok);
+      box-shadow: 0 0 8px var(--ok);
+    }
+
+    .status-dot.connecting {
+      background: var(--warn);
+      animation: blink 1s infinite;
+    }
+
+    .status-dot.error {
+      background: var(--err);
+      box-shadow: 0 0 8px var(--err);
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    .btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: var(--sans);
+      cursor: pointer;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .btn:hover {
+      background: var(--surface-2);
+      border-color: var(--border-strong);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(94, 234, 212, 0.15), rgba(167, 139, 250, 0.15));
+      border-color: rgba(94, 234, 212, 0.3);
+      color: var(--accent);
+    }
+
+    .btn.primary:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 16px rgba(94, 234, 212, 0.15);
+    }
+
+    .btn.ghost {
+      background: transparent;
+    }
+
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .sidebar {
+      grid-area: side;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      background: rgba(7, 9, 15, 0.4);
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--dim);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: var(--dim);
+    }
+
+    .search {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 10px 8px 32px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: var(--sans);
+      transition: border-color 0.15s;
+    }
+
+    .search:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .session-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .session-item {
+      padding: 12px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 4px;
+      border: 1px solid transparent;
+      position: relative;
+    }
+
+    .session-item:hover {
+      background: var(--surface);
+    }
+
+    .session-item.active {
+      background: var(--surface-2);
+      border-color: var(--border-strong);
+    }
+
+    .session-item.active::before {
+      content: '';
+      position: absolute;
+      left: -1px;
+      top: 12px;
+      bottom: 12px;
+      width: 2px;
+      background: var(--accent);
+      border-radius: 1px;
+    }
+
+    .session-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .session-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .session-badge {
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .session-badge.active {
+      background: rgba(74, 222, 128, 0.15);
+      color: var(--ok);
+    }
+
+    .session-badge.completed {
+      background: rgba(139, 151, 173, 0.12);
+      color: var(--muted);
+    }
+
+    .session-badge.error {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--err);
+    }
+
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--dim);
+      font-size: 12px;
+    }
+
+    .main {
+      grid-area: main;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main-header {
+      padding: 20px 28px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .title-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 22px;
+      font-weight: 600;
+      font-family: var(--sans);
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-left: -8px;
+      transition: background 0.15s;
+    }
+
+    .title-input:hover {
+      background: var(--surface);
+    }
+
+    .title-input:focus {
+      outline: none;
+      background: var(--surface);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .meta-chip {
+      padding: 4px 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: var(--mono);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-chip svg {
+      width: 11px;
+      height: 11px;
+      opacity: 0.7;
+    }
+
+    .meta-chip strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 2px;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: var(--sans);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.15s;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab:hover {
+      color: var(--text);
+    }
+
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-count {
+      background: var(--surface-2);
+      padding: 1px 7px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-family: var(--mono);
+    }
+
+    .tab-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    .transcript {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text);
+      max-width: 880px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .transcript-empty {
+      color: var(--dim);
+      font-style: italic;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .notes-toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .notes-status {
+      font-size: 11px;
+      color: var(--dim);
+      font-family: var(--mono);
+      margin-left: auto;
+    }
+
+    .notes-status.saving {
+      color: var(--warn);
+    }
+
+    .notes-status.saved {
+      color: var(--ok);
+    }
+
+    .notes-area {
+      width: 100%;
+      min-height: 400px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 16px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: var(--sans);
+      line-height: 1.7;
+      resize: vertical;
+      transition: border-color 0.15s;
+    }
+
+    .notes-area:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .summary-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .summary-output {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      min-height: 200px;
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      max-width: 880px;
+    }
+
+    .summary-output.empty {
+      color: var(--dim);
+      font-style: italic;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .summary-output h3 {
+      color: var(--accent);
+      margin-bottom: 8px;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .summary-output h4 {
+      color: var(--accent-2);
+      margin: 14px 0 6px;
+      font-size: 13px;
+    }
+
+    .summary-output ul {
+      padding-left: 20px;
+    }
+
+    .summary-output li {
+      margin-bottom: 4px;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .overlay.hidden {
+      display: none;
+    }
+
+    .modal {
+      background: linear-gradient(180deg, #0f1424 0%, #0a0e1a 100%);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      padding: 32px;
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal h2 {
+      font-size: 18px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .field input,
+    .field textarea {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: var(--mono);
+      transition: border-color 0.15s;
+    }
+
+    .field input:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .field textarea {
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .field .hint {
+      font-size: 11px;
+      color: var(--dim);
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 200;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: rgba(15, 20, 36, 0.95);
+      border: 1px solid var(--border-strong);
+      backdrop-filter: blur(12px);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--text);
+      min-width: 260px;
+      max-width: 380px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      animation: toast-in 0.25s ease;
+      pointer-events: auto;
+    }
+
+    .toast.success {
+      border-left: 3px solid var(--ok);
+    }
+
+    .toast.error {
+      border-left: 3px solid var(--err);
+    }
+
+    .toast.warn {
+      border-left: 3px solid var(--warn);
+    }
+
+    .toast.info {
+      border-left: 3px solid var(--accent);
+    }
+
+    .toast-icon {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .toast.success .toast-icon {
+      color: var(--ok);
+    }
+
+    .toast.error .toast-icon {
+      color: var(--err);
+    }
+
+    .toast.warn .toast-icon {
+      color: var(--warn);
+    }
+
+    .toast.info .toast-icon {
+      color: var(--accent);
+    }
+
+    @keyframes toast-in {
+      from {
+        transform: translateX(20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .toast.removing {
+      animation: toast-out 0.2s forwards;
+    }
+
+    @keyframes toast-out {
+      to {
+        transform: translateX(20px);
+        opacity: 0;
+      }
+    }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--border-strong);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .center-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      flex-direction: column;
+      gap: 12px;
+      color: var(--dim);
+      font-size: 13px;
+    }
+
+    details {
+      margin-top: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0;
+      background: var(--surface);
+    }
+
+    details summary {
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--muted);
+      list-style: none;
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details summary::before {
+      content: '▸ ';
+      color: var(--dim);
+    }
+
+    details[open] summary::before {
+      content: '▾ ';
+    }
+
+    details .content {
+      padding: 0 14px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-areas: "top" "side" "main";
+        grid-template-rows: 56px 200px 1fr;
+      }
+
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Firebase Compat (Non-Module) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="logo">
+        <div class="logo-mark"></div>
+        <span>LiveCaptions<span class="dim"> · Console</span></span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="status-pill" id="statusPill" title="Firestore connection">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Not configured</span>
+      </div>
+      <button class="btn ghost" id="refreshBtn" title="Refresh sessions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M23 4v6h-6M1 20v-6h6" />
+          <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+        </svg>
+        Refresh
+      </button>
+      <button class="btn ghost" id="settingsBtn" title="Settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3" />
+          <path
+            d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" />
+        </svg>
+      </button>
+    </header>
+
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-title">Sessions</div>
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          <input type="text" class="search" id="searchInput" placeholder="Search sessions..." />
+        </div>
+      </div>
+      <div class="session-list" id="sessionList">
+        <div class="empty-state">No sessions yet.<br />Start recording with the Python script.</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div id="mainContent">
+        <div class="center-loading">
+          <div class="spinner"></div>
+          <div>Connecting to Firestore...</div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="overlay hidden" id="settingsOverlay">
+    <div class="modal">
+      <h2 id="modalTitle">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          style="color: var(--accent);">
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+        </svg>
+        <span id="modalTitleText">Connect to Firebase</span>
+      </h2>
+      <p class="modal-sub" id="modalSub">
+        Paste your Firebase web config or service account JSON. Your data stays in your browser.
+      </p>
+
+      <div class="field">
+        <label>Firebase Config (JSON)</label>
+        <textarea id="configInput" placeholder='Paste either:
+{
+  "apiKey": "...",
+  "authDomain": "project.firebaseapp.com",
+  "projectId": "project",
+  ...
+}
+
+OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an apiKey too)'></textarea>
+        <div class="hint">
+          Get this from <strong>Firebase Console → Project Settings → General → Your apps → Web app</strong>.
+          If you only have <code>serviceAccount.json</code>, paste it and add an <code>apiKey</code> field.
+        </div>
+      </div>
+
+      <div class="field">
+        <label>OpenAI API Key (optional — for AI summaries)</label>
+        <input type="password" id="openaiKeyInput" placeholder="sk-..." />
+        <div class="hint">Stored only in your browser's localStorage. Leave empty to use the copy-paste summary flow.
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn ghost" id="cancelSettingsBtn">Cancel</button>
+        <button class="btn primary" id="saveSettingsBtn">Save & Connect</button>
+      </div>
+
+      <details>
+        <summary>How do I get my Firebase config?</summary>
+        <div class="content">
+          1. Go to <strong>console.firebase.google.com</strong> → your project<br />
+          2. Click the <strong>gear icon</strong> next to "Project Overview" → Project Settings<br />
+          3. Scroll to "Your apps" — if no web app exists, click <strong>&lt;/&gt;</strong> to create one<br />
+          4. Copy the <code>firebaseConfig</code> object and paste it above<br /><br />
+          The script writes to a collection called <code>live_captions</code>. Make sure your Firestore rules allow
+          read/write (for testing: <code>allow read, write: if true;</code>).
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // ─── State ───
+    const state = {
+      db: null,
+      sessions: [],
+      currentSessionId: null,
+      currentSession: null,
+      unsubscribeSessions: null,
+      unsubscribeSegments: null,
+      notesSaveTimer: null,
+      segments: [],
+      summary: '',
+    };
+
+
+
+    // ─── DOM ───
+    const $ = id => document.getElementById(id);
+    const els = {
+      statusDot: $('statusDot'),
+      statusText: $('statusText'),
+      sessionList: $('sessionList'),
+      searchInput: $('searchInput'),
+      refreshBtn: $('refreshBtn'),
+      settingsBtn: $('settingsBtn'),
+      mainContent: $('mainContent'),
+      settingsOverlay: $('settingsOverlay'),
+      modalTitleText: $('modalTitleText'),
+      configInput: $('configInput'),
+      openaiKeyInput: $('openaiKeyInput'),
+      saveSettingsBtn: $('saveSettingsBtn'),
+      cancelSettingsBtn: $('cancelSettingsBtn'),
+      toastContainer: $('toastContainer'),
+    };
+
+    // ─── Toast ───
+    function toast(message, type = 'info', duration = 4000) {
+      const icons = {
+        success: '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>',
+        error: '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+        warn: '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+        info: '<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+      };
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.innerHTML = `${icons[type] || icons.info}<div>${message}</div>`;
+      els.toastContainer.appendChild(t);
+      setTimeout(() => {
+        t.classList.add('removing');
+        setTimeout(() => t.remove(), 200);
+      }, duration);
+    }
+
+    function setStatus(status, text) {
+      els.statusDot.className = `status-dot ${status}`;
+      els.statusText.textContent = text;
+    }
+
+    // ─── Config ───
+    function parseConfig(raw) {
+      if (!raw || !raw.trim()) throw new Error('Config is empty');
+      let cfg;
+      try {
+        let cleaned = raw.trim();
+        const match = cleaned.match(/=\s*(\{[\s\S]*\})/);
+        if (match) cleaned = match[1];
+        cfg = JSON.parse(cleaned);
+      } catch (e) {
+        throw new Error('Invalid JSON: ' + e.message);
+      }
+
+      // Service account JSON fallback
+      if (cfg.private_key && cfg.project_id) {
+        if (!cfg.apiKey) {
+          throw new Error('Service account detected, but you need to add an "apiKey" field. Get it from Firebase Console → Project Settings → General → Web app.');
+        }
+        return {
+          apiKey: cfg.apiKey,
+          authDomain: `${cfg.project_id}.firebaseapp.com`,
+          projectId: cfg.project_id,
+          storageBucket: `${cfg.project_id}.appspot.com`,
+          messagingSenderId: cfg.messagingSenderId || '',
+          appId: cfg.appId || '',
+        };
+      }
+
+      // Standard web config
+      if (cfg.apiKey && cfg.projectId) {
+        return {
+          apiKey: cfg.apiKey,
+          authDomain: cfg.authDomain || `${cfg.projectId}.firebaseapp.com`,
+          projectId: cfg.projectId,
+          storageBucket: cfg.storageBucket || `${cfg.projectId}.appspot.com`,
+          messagingSenderId: cfg.messagingSenderId || '',
+          appId: cfg.appId || '',
+        };
+      }
+
+      throw new Error('Could not find required fields (apiKey + projectId). Check your JSON.');
+    }
+
+    function loadConfig() {
+      try {
+        const stored = localStorage.getItem('firebaseConfig');
+        return stored ? JSON.parse(stored) : null;
+      } catch { return null; }
+    }
+    function saveConfig(cfg) { localStorage.setItem('firebaseConfig', JSON.stringify(cfg)); }
+    function loadOpenAIKey() { return localStorage.getItem('openaiKey') || ''; }
+    function saveOpenAIKey(k) { localStorage.setItem('openaiKey', k); }
+
+    // ─── Firebase init ───
+    async function connectFirebase() {
+      const cfg = loadConfig();
+      if (!cfg) {
+        showSettings(true);
+        setStatus('', 'Not configured');
+        return;
+      }
+      try {
+        setStatus('connecting', 'Connecting...');
+        // Delete existing app if it exists
+        if (firebase.apps.length > 0) {
+          await firebase.app().delete();
+        }
+        firebase.initializeApp(cfg);
+        state.db = firebase.firestore();
+        setStatus('connected', cfg.projectId);
+        toast('Connected to Firestore', 'success', 2500);
+        subscribeToSessions();
+      } catch (err) {
+        console.error(err);
+        setStatus('error', 'Connection failed');
+        toast('Failed to connect: ' + err.message, 'error', 6000);
+        showSettings(true);
+      }
+    }
+
+    // ─── Sessions ───
+    function subscribeToSessions() {
+      if (state.unsubscribeSessions) state.unsubscribeSessions();
+      try {
+        const q = state.db.collection('live_captions').orderBy('started_at', 'desc');
+        state.unsubscribeSessions = q.onSnapshot(
+          (snap) => {
+            state.sessions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderSessionList();
+            if (state.currentSessionId) {
+              const updated = state.sessions.find(s => s.id === state.currentSessionId);
+              if (updated) {
+                state.currentSession = updated;
+                renderMain();
+              }
+            }
+          },
+          (err) => {
+            console.error(err);
+            setStatus('error', 'Snapshot error');
+            toast('Firestore error: ' + err.message + ' — check your security rules.', 'error', 8000);
+          }
+        );
+      } catch (err) {
+        toast('Failed to subscribe: ' + err.message, 'error');
+      }
+    }
+
+    function renderSessionList() {
+      const filter = els.searchInput.value.trim().toLowerCase();
+      const filtered = state.sessions.filter(s => {
+        if (!filter) return true;
+        const title = (s.title || 'Untitled').toLowerCase();
+        const id = (s.id || '').toLowerCase();
+        const transcript = (s.full_transcript || '').toLowerCase();
+        return title.includes(filter) || id.includes(filter) || transcript.includes(filter);
+      });
+
+      if (filtered.length === 0) {
+        els.sessionList.innerHTML = `<div class="empty-state">${state.sessions.length === 0 ? 'No sessions yet.<br/>Start recording with the Python script.' : 'No matches found.'}</div>`;
+        return;
+      }
+
+      els.sessionList.innerHTML = filtered.map(s => {
+        const isActive = s.id === state.currentSessionId;
+        const status = s.status || 'completed';
+        const title = escapeHtml(s.title || 'Untitled session');
+        const started = formatRelative(s.started_at);
+        const duration = s.duration_seconds ? formatDuration(s.duration_seconds) : '—';
+        const words = s.word_count || 0;
+        return `
+      <div class="session-item ${isActive ? 'active' : ''}" data-id="${escapeHtml(s.id)}">
+        <div class="session-title">${title}</div>
+        <div class="session-meta">
+          <span class="session-badge ${status}">${status}</span>
+          <span>${started}</span>
+          <span>·</span>
+          <span>${words}w</span>
+          <span>·</span>
+          <span>${duration}</span>
+        </div>
+      </div>
+    `;
+      }).join('');
+
+      els.sessionList.querySelectorAll('.session-item').forEach(el => {
+        el.addEventListener('click', () => selectSession(el.dataset.id));
+      });
+    }
+
+    async function selectSession(id) {
+      state.currentSessionId = id;
+      state.currentSession = state.sessions.find(s => s.id === id);
+      renderSessionList();
+      renderMain();
+      await loadSegments(id);
+    }
+
+    function renderMain() {
+      const s = state.currentSession;
+      if (!s) {
+        els.mainContent.innerHTML = `
+      <div class="center-loading">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--dim);"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <div>Select a session from the left</div>
+      </div>
+    `;
+        return;
+      }
+
+      const title = s.title || 'Untitled session';
+      const started = formatDateTime(s.started_at);
+      const ended = s.ended_at ? formatDateTime(s.ended_at) : '—';
+      const duration = s.duration_seconds ? formatDuration(s.duration_seconds) : '—';
+      const words = s.word_count || 0;
+      const segs = s.segment_count || 0;
+      const method = s.capture_method || '—';
+      const transcript = s.full_transcript || '';
+      const notes = s.notes || '';
+
+      els.mainContent.innerHTML = `
+    <div class="main-header">
+      <div class="title-row">
+        <input type="text" class="title-input" id="titleInput" value="${escapeAttr(title)}" placeholder="Untitled meeting..." />
+      </div>
+      <div class="meta-row">
+        <div class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Started <strong>${started}</strong></div>
+        <div class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Ended <strong>${ended}</strong></div>
+        <div class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Duration <strong>${duration}</strong></div>
+        <div class="meta-chip"><strong>${words}</strong> words</div>
+        <div class="meta-chip"><strong>${segs}</strong> segments</div>
+        <div class="meta-chip">via <strong>${escapeHtml(method)}</strong></div>
+        <div class="meta-chip">ID: <strong>${escapeHtml(s.id)}</strong></div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="transcript">Transcript</button>
+      <button class="tab" data-tab="notes">Notes <span class="tab-count" id="notesBadge">${notes ? '✓' : ''}</span></button>
+      <button class="tab" data-tab="summary">AI Summary</button>
+    </div>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="pane-transcript">
+        <div class="transcript" id="transcriptText">${transcript ? escapeHtml(transcript) : '<div class="transcript-empty">No transcript captured yet. If the session is active, text will appear here as it streams in.</div>'}</div>
+      </div>
+
+      <div class="tab-pane" id="pane-notes">
+        <div class="notes-toolbar">
+          <button class="btn primary" id="saveNotesBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save Notes
+          </button>
+          <button class="btn ghost" id="exportNotesBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+          <span class="notes-status" id="notesStatus"></span>
+        </div>
+        <textarea class="notes-area" id="notesArea" placeholder="Add meeting notes, decisions, action items, links, or anything else...">${escapeHtml(notes)}</textarea>
+      </div>
+
+      <div class="tab-pane" id="pane-summary">
+        <div class="summary-controls">
+          <button class="btn primary" id="aiSummaryBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Generate with AI
+          </button>
+          <button class="btn ghost" id="localExtractBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Local Extract
+          </button>
+          <button class="btn ghost" id="copySummaryBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+          <button class="btn ghost" id="copyPromptBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+            Copy Prompt for ChatGPT
+          </button>
+        </div>
+        <div class="summary-output empty" id="summaryOutput">Generate a summary, or use "Local Extract" for a no-API quick breakdown of action items and key sentences.</div>
+      </div>
+    </div>
+  `;
+
+      bindMainEvents();
+    }
+
+    function bindMainEvents() {
+      document.querySelectorAll('.tab').forEach(t => {
+        t.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+          document.querySelectorAll('.tab-pane').forEach(x => x.classList.remove('active'));
+          t.classList.add('active');
+          $('pane-' + t.dataset.tab).classList.add('active');
+        });
+      });
+
+      const titleInput = $('titleInput');
+      if (titleInput) {
+        let titleTimer;
+        titleInput.addEventListener('input', () => {
+          clearTimeout(titleTimer);
+          titleTimer = setTimeout(saveTitle, 800);
+        });
+        titleInput.addEventListener('blur', saveTitle);
+      }
+
+      const notesArea = $('notesArea');
+      const notesStatus = $('notesStatus');
+      if (notesArea) {
+        notesArea.addEventListener('input', () => {
+          notesStatus.className = 'notes-status saving';
+          notesStatus.textContent = 'Saving...';
+          clearTimeout(state.notesSaveTimer);
+          state.notesSaveTimer = setTimeout(saveNotes, 1200);
+        });
+      }
+      const saveBtn = $('saveNotesBtn');
+      if (saveBtn) saveBtn.addEventListener('click', saveNotes);
+      const exportBtn = $('exportNotesBtn');
+      if (exportBtn) exportBtn.addEventListener('click', exportNotes);
+
+      const aiBtn = $('aiSummaryBtn');
+      if (aiBtn) aiBtn.addEventListener('click', generateAISummary);
+      const localBtn = $('localExtractBtn');
+      if (localBtn) localBtn.addEventListener('click', generateLocalExtract);
+      const copyBtn = $('copySummaryBtn');
+      if (copyBtn) copyBtn.addEventListener('click', copySummary);
+      const copyPromptBtn = $('copyPromptBtn');
+      if (copyPromptBtn) copyPromptBtn.addEventListener('click', copyPrompt);
+    }
+
+    async function saveTitle() {
+      if (!state.currentSessionId || !state.db) return;
+      const titleInput = $('titleInput');
+      if (!titleInput) return;
+      const newTitle = titleInput.value.trim();
+      try {
+        await state.db.collection('live_captions').doc(state.currentSessionId).set({ title: newTitle }, { merge: true });
+        state.currentSession.title = newTitle;
+        const s = state.sessions.find(x => x.id === state.currentSessionId);
+        if (s) s.title = newTitle;
+        renderSessionList();
+        toast('Title saved', 'success', 1500);
+      } catch (err) {
+        toast('Failed to save title: ' + err.message, 'error');
+      }
+    }
+
+    async function saveNotes() {
+      if (!state.currentSessionId || !state.db) return;
+      const notesArea = $('notesArea');
+      if (!notesArea) return;
+      const notes = notesArea.value;
+      const notesStatus = $('notesStatus');
+      try {
+        await state.db.collection('live_captions').doc(state.currentSessionId).set({ notes }, { merge: true });
+        state.currentSession.notes = notes;
+        if (notesStatus) {
+          notesStatus.className = 'notes-status saved';
+          notesStatus.textContent = 'Saved · ' + new Date().toLocaleTimeString();
+        }
+        const badge = $('notesBadge');
+        if (badge) badge.textContent = notes ? '✓' : '';
+      } catch (err) {
+        if (notesStatus) {
+          notesStatus.className = 'notes-status';
+          notesStatus.textContent = 'Save failed';
+        }
+        toast('Failed to save notes: ' + err.message, 'error');
+      }
+    }
+
+    function exportNotes() {
+      const s = state.currentSession;
+      if (!s) return;
+      const notes = $('notesArea')?.value || '';
+      const transcript = s.full_transcript || '';
+      const content = `# ${s.title || 'Untitled session'}
+
+**Date:** ${formatDateTime(s.started_at)}
+**Duration:** ${formatDuration(s.duration_seconds || 0)}
+**Word count:** ${s.word_count || 0}
+
+---
+
+## Notes
+
+ ${notes || '(no notes)'}
+
+---
+
+## Full Transcript
+
+ ${transcript || '(no transcript)'}
+`;
+      downloadFile(`${(s.title || 'session').replace(/[^a-z0-9]/gi, '_')}.md`, content);
+      toast('Exported as Markdown', 'success');
+    }
+
+    function downloadFile(filename, content) {
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    async function loadSegments(sessionId) {
+      if (state.unsubscribeSegments) state.unsubscribeSegments();
+      try {
+        const q = state.db.collection('live_captions').doc(sessionId).collection('segments').orderBy('sequence');
+        state.unsubscribeSegments = q.onSnapshot(
+          (snap) => {
+            state.segments = snap.docs.map(d => d.data());
+            if (state.currentSession && !state.currentSession.full_transcript) {
+              const text = state.segments.map(s => s.text || '').join(' ').trim();
+              const tEl = $('transcriptText');
+              if (tEl) {
+                tEl.innerHTML = text ? escapeHtml(text) : '<div class="transcript-empty">Listening... text will appear as it streams.</div>';
+              }
+            }
+          },
+          (err) => {
+            console.warn('Segments subscription error:', err);
+          }
+        );
+      } catch (err) {
+        console.warn('Could not load segments:', err);
+      }
+    }
+
+    async function generateAISummary() {
+      const s = state.currentSession;
+      if (!s) return;
+      const transcript = s.full_transcript || state.segments.map(x => x.text || '').join(' ');
+      if (!transcript || transcript.length < 20) {
+        toast('No transcript available to summarize', 'warn');
+        return;
+      }
+
+      const key = loadOpenAIKey();
+      if (!key) {
+        toast('No OpenAI key set. Use Settings to add one, or use Local Extract / Copy Prompt.', 'warn', 5000);
+        showSettings(false);
+        return;
+      }
+
+      const out = $('summaryOutput');
+      out.classList.remove('empty');
+      out.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:var(--muted);"><div class="spinner"></div> Generating summary...</div>';
+      $('aiSummaryBtn').disabled = true;
+
+      try {
+        const prompt = `You are a meeting assistant. Summarize this meeting transcript. Output in Markdown with these sections:
+## Summary
+(2-3 sentence overview)
+## Key Points
+- (bullet list of important points)
+## Action Items
+- (bullet list of concrete action items, with owner if mentioned)
+## Decisions
+- (bullet list of decisions made)
+## Open Questions
+- (any unresolved questions)
+
+Transcript:
+"""
+ ${transcript.slice(0, 24000)}
+"""`;
+
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`,
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: 'You are a helpful meeting assistant that produces clean, structured summaries.' },
+              { role: 'user', content: prompt }
+            ],
+            temperature: 0.3,
+          })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        const summary = data.choices?.[0]?.message?.content || '(no response)';
+        state.summary = summary;
+        renderSummary(summary);
+        toast('Summary generated', 'success');
+      } catch (err) {
+        out.classList.add('empty');
+        out.innerHTML = `Failed to generate: ${escapeHtml(err.message)}`;
+        toast('AI summary failed: ' + err.message, 'error', 6000);
+      } finally {
+        $('aiSummaryBtn').disabled = false;
+      }
+    }
+
+    function renderSummary(md) {
+      const out = $('summaryOutput');
+      out.classList.remove('empty');
+      out.innerHTML = mdToHtml(md);
+    }
+
+    function mdToHtml(md) {
+      let h = escapeHtml(md);
+      h = h.replace(/^### (.+)$/gm, '<h4>$1</h4>');
+      h = h.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+      h = h.replace(/^# (.+)$/gm, '<h3>$1</h3>');
+      h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      h = h.replace(/^(?:- |\* )(.+)$/gm, '<li>$1</li>');
+      h = h.replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>');
+      h = h.replace(/<\/ul>\s*<ul>/g, '');
+      h = h.replace(/\n\n/g, '</p><p>');
+      h = '<p>' + h + '</p>';
+      h = h.replace(/<p>(<h[34]>)/g, '$1').replace(/(<\/h[34]>)<\/p>/g, '$1');
+      h = h.replace(/<p>(<ul>)/g, '$1').replace(/(<\/ul>)<\/p>/g, '$1');
+      return h;
+    }
+
+    function generateLocalExtract() {
+      const s = state.currentSession;
+      if (!s) return;
+      const transcript = s.full_transcript || state.segments.map(x => x.text || '').join(' ');
+      if (!transcript) {
+        toast('No transcript to analyze', 'warn');
+        return;
+      }
+
+      const sentences = transcript.split(/(?<=[.!?])\s+/).map(x => x.trim()).filter(x => x.length > 5);
+      const actionPatterns = [/\b(?:we need to|we should|let's|lets|action item|to-do|todo|follow up|reach out|make sure|don't forget|remember to|going to|will|by next|before next)\b/i];
+      const actionItems = sentences.filter(s => actionPatterns.some(p => p.test(s)));
+      const decisionPatterns = [/\b(?:decided|agreed|conclusion|resolved|finalized|approved|we will go with|let's go with|chose|chosen)\b/i];
+      const decisions = sentences.filter(s => decisionPatterns.some(p => p.test(s)));
+      const questions = sentences.filter(s => s.endsWith('?'));
+      const sorted = [...sentences].sort((a, b) => b.length - a.length).slice(0, 5);
+
+      const summary = `## Summary
+Local extract from ${sentences.length} sentences, ${s.word_count || transcript.split(/\s+/).length} words.
+
+## Action Items
+ ${actionItems.length ? actionItems.map(x => `- ${x}`).join('\n') : '- (none detected)'}
+
+## Decisions
+ ${decisions.length ? decisions.map(x => `- ${x}`).join('\n') : '- (none detected)'}
+
+## Open Questions
+ ${questions.length ? questions.slice(0, 10).map(x => `- ${x}`).join('\n') : '- (none detected)'}
+
+## Key Sentences
+ ${sorted.map(x => `- ${x}`).join('\n')}
+`;
+      state.summary = summary;
+      renderSummary(summary);
+      toast('Local extract complete', 'success');
+    }
+
+    function copySummary() {
+      if (!state.summary) {
+        toast('Generate a summary first', 'warn');
+        return;
+      }
+      navigator.clipboard.writeText(state.summary).then(
+        () => toast('Summary copied', 'success', 2000),
+        () => toast('Clipboard blocked — select text manually', 'error')
+      );
+    }
+
+    function copyPrompt() {
+      const s = state.currentSession;
+      if (!s) return;
+      const transcript = s.full_transcript || state.segments.map(x => x.text || '').join(' ');
+      if (!transcript) { toast('No transcript', 'warn'); return; }
+      const prompt = `Summarize this meeting transcript. Provide a summary, key points, action items, decisions, and open questions.
+
+Transcript:
+"""
+ ${transcript}
+"""`;
+      navigator.clipboard.writeText(prompt).then(
+        () => toast('Prompt + transcript copied — paste into ChatGPT/Claude', 'success', 3500),
+        () => toast('Clipboard blocked', 'error')
+      );
+    }
+
+    function showSettings(isInitial) {
+      els.modalTitleText.textContent = isInitial ? 'Connect to Firebase' : 'Settings';
+      els.configInput.value = '';
+      els.openaiKeyInput.value = loadOpenAIKey();
+      els.settingsOverlay.classList.remove('hidden');
+    }
+    function hideSettings() { els.settingsOverlay.classList.add('hidden'); }
+
+    els.saveSettingsBtn.addEventListener('click', async () => {
+      const raw = els.configInput.value.trim();
+      if (raw) {
+        try {
+          const cfg = parseConfig(raw);
+          saveConfig(cfg);
+        } catch (err) {
+          toast('Config error: ' + err.message, 'error', 5000);
+          return;
+        }
+      } else if (!loadConfig()) {
+        toast('Please paste your Firebase config', 'warn');
+        return;
+      }
+      saveOpenAIKey(els.openaiKeyInput.value.trim());
+      hideSettings();
+      await connectFirebase();
+    });
+    els.cancelSettingsBtn.addEventListener('click', () => {
+      if (loadConfig()) hideSettings();
+      else toast('You need to paste a config to continue', 'warn');
+    });
+    els.settingsBtn.addEventListener('click', () => showSettings(false));
+    els.refreshBtn.addEventListener('click', () => {
+      if (!state.db) { toast('Not connected', 'warn'); return; }
+      subscribeToSessions();
+      toast('Refreshed', 'info', 1500);
+    });
+    els.searchInput.addEventListener('input', renderSessionList);
+
+    // ─── Helpers ───
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function escapeAttr(s) { return escapeHtml(s); }
+
+    function toDate(v) {
+      if (!v) return null;
+      if (v instanceof Date) return v;
+      if (typeof v === 'string') return new Date(v);
+      if (typeof v === 'number') return new Date(v);
+      if (v && typeof v.toDate === 'function') return v.toDate(); // Firestore Timestamp
+      if (v && v.seconds) return new Date(v.seconds * 1000);
+      return null;
+    }
+
+    function formatDateTime(v) {
+      const d = toDate(v);
+      if (!d) return '—';
+      return d.toLocaleString(undefined, { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+    function formatRelative(v) {
+      const d = toDate(v);
+      if (!d) return '—';
+      const diff = Date.now() - d.getTime();
+      const sec = Math.floor(diff / 1000);
+      if (sec < 60) return 'just now';
+      if (sec < 3600) return Math.floor(sec / 60) + 'm ago';
+      if (sec < 86400) return Math.floor(sec / 3600) + 'h ago';
+      if (sec < 604800) return Math.floor(sec / 86400) + 'd ago';
+      return d.toLocaleDateString();
+    }
+    function formatDuration(s) {
+      s = Math.floor(s);
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      if (h > 0) return `${h}h ${m}m`;
+      if (m > 0) return `${m}m ${sec}s`;
+      return `${sec}s`;
+    }
+
+    // ─── Init ───
+    window.addEventListener('DOMContentLoaded', () => {
+      connectFirebase();
+    });
+
+    window.addEventListener('online', () => {
+      toast('Back online — reconnecting', 'info');
+      connectFirebase();
+    });
+    window.addEventListener('offline', () => {
+      setStatus('error', 'Offline');
+      toast('You are offline. Data will sync when reconnected.', 'warn');
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !els.settingsOverlay.classList.contains('hidden')) {
+        if (loadConfig()) hideSettings();
+      }
+    });
+  </script>
+</body>
+
+</html>
