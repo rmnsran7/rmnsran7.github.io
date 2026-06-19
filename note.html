@@ -1329,9 +1329,9 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       </div>
 
       <div class="field">
-        <label>OpenAI API Key (optional — for AI summaries)</label>
-        <input type="password" id="openaiKeyInput" placeholder="sk-..." />
-        <div class="hint">Stored only in your browser's localStorage. Leave empty to use the copy-paste summary flow.
+        <label>Groq Text API Key (optional — for AI summaries and note generation)</label>
+        <input type="password" id="groqTextKeyInput" placeholder="gsk_..." />
+        <div class="hint">Stored only in your browser's localStorage. Required for AI summary and auto-generating notes.
         </div>
       </div>
 
@@ -1413,7 +1413,7 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       settingsOverlay: $('settingsOverlay'),
       modalTitleText: $('modalTitleText'),
       configInput: $('configInput'),
-      openaiKeyInput: $('openaiKeyInput'),
+      groqTextKeyInput: $('groqTextKeyInput'),
       groqKeyInput: $('groqKeyInput'),
       saveSettingsBtn: $('saveSettingsBtn'),
       cancelSettingsBtn: $('cancelSettingsBtn'),
@@ -1504,8 +1504,8 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
       } catch { return null; }
     }
     function saveConfig(cfg) { localStorage.setItem('firebaseConfig', JSON.stringify(cfg)); }
-    function loadOpenAIKey() { return localStorage.getItem('openaiKey') || ''; }
-    function saveOpenAIKey(k) { localStorage.setItem('openaiKey', k); }
+    function loadGroqTextKey() { return localStorage.getItem('groqTextKey') || ''; }
+    function saveGroqTextKey(k) { localStorage.setItem('groqTextKey', k); }
     function loadGroqKey() { return localStorage.getItem('groqKey') || ''; }
     function saveGroqKey(k) { localStorage.setItem('groqKey', k); }
 
@@ -1689,7 +1689,15 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
             <div class="add-form">
               <input type="text" id="dashInputTitle" placeholder="${placeholderTitle}" />
               <textarea id="dashInputDesc" rows="3" placeholder="${placeholderDesc}"></textarea>
-              <button class="btn" id="dashBtnAdd">Save</button>
+              <div style="display:flex; justify-content: space-between; align-items: center;">
+                <button class="btn ghost" id="dashBtnRecord" style="color:var(--err); border-color: rgba(248,113,113,0.3); padding: 8px 16px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;">
+                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                    <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                  </svg> Record Note
+                </button>
+                <button class="btn" id="dashBtnAdd">Save</button>
+              </div>
             </div>
             <div class="dash-list">
               ${listHtml || '<div class="empty-state">No items yet.</div>'}
@@ -1701,8 +1709,99 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
 
     function bindDashboardEvents(collName) {
       const btnAdd = document.getElementById('dashBtnAdd');
+      const btnRecord = document.getElementById('dashBtnRecord');
       const inputTitle = document.getElementById('dashInputTitle');
       const inputDesc = document.getElementById('dashInputDesc');
+      
+      let isDashRecording = false;
+      let dashRecorder = null;
+      let dashStream = null;
+      let dashAudioChunks = [];
+
+      btnRecord.addEventListener('click', async () => {
+        if (!isDashRecording) {
+          try {
+            dashStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            dashRecorder = new MediaRecorder(dashStream);
+            dashAudioChunks = [];
+            dashRecorder.ondataavailable = e => { if (e.data.size > 0) dashAudioChunks.push(e.data); };
+            dashRecorder.onstop = async () => {
+              btnRecord.innerHTML = '<div class="spinner" style="width:14px;height:14px;margin-right:6px;"></div> Processing...';
+              btnRecord.disabled = true;
+              
+              const audioBlob = new Blob(dashAudioChunks, { type: 'audio/webm' });
+              const groqKey = loadGroqKey();
+              if (!groqKey) {
+                toast('Groq Audio API key missing', 'error');
+                resetDashRecordBtn();
+                return;
+              }
+              
+              const formData = new FormData();
+              formData.append('file', audioBlob, 'note.webm');
+              formData.append('model', 'whisper-large-v3-turbo');
+              formData.append('response_format', 'text');
+              
+              try {
+                const res = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+                  method: 'POST',
+                  headers: { 'Authorization': `Bearer ${groqKey}` },
+                  body: formData
+                });
+                if (!res.ok) throw new Error(await res.text());
+                const transcript = await res.text();
+                
+                const textKey = loadGroqTextKey();
+                if (!textKey) {
+                   inputDesc.value = transcript;
+                   toast('Groq Text Key missing. Inserted transcript directly.', 'warn');
+                } else {
+                   btnRecord.innerHTML = '<div class="spinner" style="width:14px;height:14px;margin-right:6px;"></div> Formatting...';
+                   const prompt = `Convert the following transcript into a short descriptive title and a summarized description. Output ONLY a JSON object in this exact format, with no markdown formatting or extra text: {"title": "The Title", "description": "The Description"}. \n\nTranscript: ${transcript}`;
+                   const llmRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                      method: 'POST',
+                      headers: { 'Authorization': `Bearer ${textKey}`, 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        model: 'llama-3.1-8b-instant',
+                        messages: [{ role: 'user', content: prompt }],
+                        temperature: 0.1,
+                        response_format: { type: "json_object" }
+                      })
+                   });
+                   if (!llmRes.ok) throw new Error(await llmRes.text());
+                   const llmData = await llmRes.json();
+                   const parsed = JSON.parse(llmData.choices[0].message.content);
+                   inputTitle.value = parsed.title || 'Note';
+                   inputDesc.value = parsed.description || transcript;
+                   toast('Note formatted successfully!', 'success');
+                }
+              } catch (err) {
+                console.error(err);
+                toast('Recording failed: ' + err.message, 'error');
+              } finally {
+                resetDashRecordBtn();
+              }
+            };
+            
+            dashRecorder.start();
+            isDashRecording = true;
+            btnRecord.classList.add('recording');
+            btnRecord.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"/></svg> Stop Recording';
+          } catch (err) {
+            toast('Microphone access denied', 'error');
+          }
+        } else {
+          dashRecorder.stop();
+          isDashRecording = false;
+          if (dashStream) dashStream.getTracks().forEach(t => t.stop());
+        }
+      });
+
+      function resetDashRecordBtn() {
+        btnRecord.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg> Record Note';
+        btnRecord.disabled = false;
+        btnRecord.classList.remove('recording');
+      }
 
       btnAdd.addEventListener('click', async () => {
         const title = inputTitle.value.trim();
@@ -1769,6 +1868,11 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
     <div class="main-header">
       <div class="title-row" style="display: flex; gap: 12px; align-items: center;">
         <input type="text" class="title-input" id="titleInput" value="${escapeAttr(title)}" placeholder="${isRec ? 'Voice Note...' : 'Untitled meeting...'}" style="flex:1;" />
+        <select id="selMoveSession" class="btn ghost" style="padding: 6px 12px; height: 32px; background: var(--surface); color: var(--text);">
+          <option value="">Move to...</option>
+          <option value="active_projects">Active Projects</option>
+          <option value="general_notes">General Notes</option>
+        </select>
         <button class="btn ghost" id="btnDeleteSession" style="color: var(--err); border-color: rgba(248,113,113,0.3); padding: 6px 12px; height: 32px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 6px;"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Delete</button>
       </div>
       <div class="meta-row">
@@ -1896,6 +2000,65 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
           }
         });
       }
+
+      const selMoveSession = $('selMoveSession');
+      if (selMoveSession) {
+        selMoveSession.addEventListener('change', async (e) => {
+          const targetColl = e.target.value;
+          if (!targetColl) return;
+          e.target.value = ''; // reset
+          
+          if (!confirm(`Move this session to ${targetColl === 'active_projects' ? 'Active Projects' : 'General Notes'}?`)) return;
+          
+          const transcript = state.currentSession.full_transcript || state.segments.map(x => x.text || '').join(' ');
+          if (!transcript || transcript.length < 10) {
+            toast('Transcript too short to move', 'warn');
+            return;
+          }
+          
+          const textKey = loadGroqTextKey();
+          if (!textKey) {
+            toast('Groq Text Key missing. Required for formatting.', 'error');
+            return;
+          }
+          
+          toast('Moving and formatting session...', 'info');
+          const prompt = `Convert the following transcript into a short descriptive title and a summarized description. Output ONLY a JSON object in this exact format, with no markdown formatting or extra text: {"title": "The Title", "description": "The Description"}. \n\nTranscript: ${transcript.slice(0, 24000)}`;
+          try {
+             const llmRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${textKey}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  model: 'llama-3.1-8b-instant',
+                  messages: [{ role: 'user', content: prompt }],
+                  temperature: 0.1,
+                  response_format: { type: "json_object" }
+                })
+             });
+             if (!llmRes.ok) throw new Error(await llmRes.text());
+             const llmData = await llmRes.json();
+             const parsed = JSON.parse(llmData.choices[0].message.content);
+             
+             await addDoc(collection(state.db, targetColl), {
+               title: parsed.title || state.currentSession.title || 'Moved Note',
+               description: parsed.description || transcript,
+               created_at: serverTimestamp()
+             });
+             
+             const oldColl = state.currentSession.source === 'browser_recording' ? 'voice_notes' : 'live_captions';
+             await deleteDoc(doc(state.db, oldColl, state.currentSessionId));
+             
+             toast('Successfully moved session!', 'success');
+             state.currentSessionId = targetColl === 'active_projects' ? 'SPECIAL_PROJECTS' : 'SPECIAL_NOTES';
+             state.currentSession = null;
+             renderSessionList();
+             renderMain();
+          } catch (err) {
+             console.error(err);
+             toast('Failed to move: ' + err.message, 'error');
+          }
+        });
+      }
     }
 
     async function saveTitle() {
@@ -2011,9 +2174,9 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
         return;
       }
 
-      const key = loadOpenAIKey();
+      const key = loadGroqTextKey();
       if (!key) {
-        toast('No OpenAI key set. Use Settings to add one, or use Local Extract / Copy Prompt.', 'warn', 5000);
+        toast('No Groq Text Key set. Use Settings to add one, or use Local Extract / Copy Prompt.', 'warn', 5000);
         showSettings(false);
         return;
       }
@@ -2041,14 +2204,14 @@ Transcript:
  ${transcript.slice(0, 24000)}
 """`;
 
-        const res = await fetch('https://api.openai.com/v1/chat/completions', {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${key}`,
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model: 'llama-3.1-8b-instant',
             messages: [
               { role: 'system', content: 'You are a helpful meeting assistant that produces clean, structured summaries.' },
               { role: 'user', content: prompt }
@@ -2165,7 +2328,7 @@ Transcript:
     function showSettings(isInitial) {
       els.modalTitleText.textContent = isInitial ? 'Connect to Firebase' : 'Settings';
       els.configInput.value = '';
-      els.openaiKeyInput.value = loadOpenAIKey();
+      els.groqTextKeyInput.value = loadGroqTextKey();
       els.settingsOverlay.classList.remove('hidden');
     }
     function hideSettings() { els.settingsOverlay.classList.add('hidden'); }
@@ -2184,7 +2347,7 @@ Transcript:
         toast('Please paste your Firebase config', 'warn');
         return;
       }
-      saveOpenAIKey(els.openaiKeyInput.value.trim());
+      saveGroqTextKey(els.groqTextKeyInput.value.trim());
       saveGroqKey(els.groqKeyInput.value.trim());
       hideSettings();
       await connectFirebase();
