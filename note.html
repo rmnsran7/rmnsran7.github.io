@@ -1676,6 +1676,12 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
           <button class="item-delete-btn" data-id="${item.id}" title="Delete"><svg style="pointer-events:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
           <div class="item-card-title">${escapeHtml(item.title)}</div>
           <div class="item-card-desc">${escapeHtml(item.description || '')}</div>
+          ${item.raw_transcript ? `
+            <details style="margin-top: 16px; border-top: 1px dashed var(--border); padding-top: 12px; cursor: pointer; color: var(--muted); font-size: 13px;">
+              <summary style="font-weight: 500;">View Raw Transcript</summary>
+              <div style="margin-top: 8px; white-space: pre-wrap; color: var(--dim); line-height: 1.5; font-family: monospace;">${escapeHtml(item.raw_transcript)}</div>
+            </details>
+          ` : ''}
           <div class="item-card-date">${formatDateTime(item.created_at)}</div>
         </div>
       `).join('');
@@ -1750,6 +1756,7 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
                 });
                 if (!res.ok) throw new Error(await res.text());
                 const transcript = await res.text();
+                state.lastRawTranscript = transcript;
                 
                 const textKey = loadGroqTextKey();
                 if (!textKey) {
@@ -1757,12 +1764,12 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
                    toast('Groq Text Key missing. Inserted transcript directly.', 'warn');
                 } else {
                    btnRecord.innerHTML = '<div class="spinner" style="width:14px;height:14px;margin-right:6px;"></div> Formatting...';
-                   const prompt = `Convert the following transcript into a short descriptive title and a summarized description. Output ONLY a JSON object in this exact format, with no markdown formatting or extra text: {"title": "The Title", "description": "The Description"}. \n\nTranscript: ${transcript}`;
+                   const prompt = `You are a meticulous assistant. Read the following raw voice transcript and extract a short, descriptive title. Then, write a HIGHLY DETAILED, properly formatted description that captures ALL the important information, context, and nuance from the transcript. DO NOT overly summarize or omit details. If it describes a project or task, structure it logically with bullet points or paragraphs. Output ONLY a valid JSON object in exactly this format: {"title": "The Title", "description": "The highly detailed description..."}. \n\nTranscript: ${transcript}`;
                    const llmRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                       method: 'POST',
                       headers: { 'Authorization': `Bearer ${textKey}`, 'Content-Type': 'application/json' },
                       body: JSON.stringify({
-                        model: 'llama-3.1-8b-instant',
+                        model: 'llama-3.3-70b-versatile',
                         messages: [{ role: 'user', content: prompt }],
                         temperature: 0.1,
                         response_format: { type: "json_object" }
@@ -1809,10 +1816,14 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
         if (!title) return toast('Title is required', 'warn');
         try {
           await addDoc(collection(state.db, collName), {
-            title, description: desc, created_at: serverTimestamp()
+            title, 
+            description: desc, 
+            raw_transcript: state.lastRawTranscript || null,
+            created_at: serverTimestamp()
           });
           inputTitle.value = '';
           inputDesc.value = '';
+          state.lastRawTranscript = null;
           toast('Saved successfully', 'success', 2000);
         } catch (err) { toast(err.message, 'error'); }
       });
@@ -2023,13 +2034,13 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
           }
           
           toast('Moving and formatting session...', 'info');
-          const prompt = `Convert the following transcript into a short descriptive title and a summarized description. Output ONLY a JSON object in this exact format, with no markdown formatting or extra text: {"title": "The Title", "description": "The Description"}. \n\nTranscript: ${transcript.slice(0, 24000)}`;
+          const prompt = `You are a meticulous assistant. Read the following raw meeting transcript and extract a short, descriptive title. Then, write a HIGHLY DETAILED, properly formatted description that captures ALL the important information, decisions, action items, context, and nuance from the transcript. DO NOT overly summarize or omit details. Output ONLY a valid JSON object in exactly this format: {"title": "The Title", "description": "The highly detailed description..."}. \n\nTranscript: ${transcript.slice(0, 24000)}`;
           try {
              const llmRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${textKey}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  model: 'llama-3.1-8b-instant',
+                  model: 'llama-3.3-70b-versatile',
                   messages: [{ role: 'user', content: prompt }],
                   temperature: 0.1,
                   response_format: { type: "json_object" }
@@ -2042,6 +2053,7 @@ OR your serviceAccount.json (project_id will be extracted, you&#39;ll need an ap
              await addDoc(collection(state.db, targetColl), {
                title: parsed.title || state.currentSession.title || 'Moved Note',
                description: parsed.description || transcript,
+               raw_transcript: transcript,
                created_at: serverTimestamp()
              });
              
